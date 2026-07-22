@@ -30,7 +30,7 @@ export const DashboardPage = () => {
           <h3 className="text-lg font-bold text-foreground mb-2">
             {t('admin.statsBookings', 'Total Bookings')}
           </h3>
-          <p className="text-3xl font-bold text-primary">0</p>
+          <p className="text-3xl font-bold text-primary">00</p>
         </div>
         <div className="p-6 bg-secondary/10 border border-border rounded-lg">
           <h3 className="text-lg font-bold text-foreground mb-2">

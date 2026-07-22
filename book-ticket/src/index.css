@@ -1,0 +1,126 @@
+@import "tailwindcss";
+@custom-variant dark (&:is(.dark *));
+
+@layer base {
+  body {
+    font-family: "Aptos", "Montserrat", sans-serif !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  input,
+  textarea,
+  [contenteditable="true"] {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Aptos Display", "Montserrat", sans-serif !important;
+    font-weight: 600 !important;
+  }
+
+  html,
+  body {
+    scroll-padding-top: 100px;
+    /* Offset for sticky header (h-16 = 64px) */
+  }
+
+  :root {
+    --background: #F7F1E8;
+    --foreground: #1B120F;
+    --primary: #C9A96B;
+    --primary-foreground: #1B120F;
+    --secondary: #BDAF9D;
+    --secondary-foreground: #1B120F;
+    --muted: #BDAF9D;
+    --muted-foreground: #2A1C17;
+    --accent: #C9A96B;
+    --accent-foreground: #1B120F;
+    --border: #BDAF9D;
+    --input: #BDAF9D;
+    --ring: #C9A96B;
+    --destructive: #ef4444;
+    --destructive-foreground: #F7F1E8;
+  }
+
+  .dark {
+    --background: #1B120F;
+    --foreground: #F7F1E8;
+    --primary: #C9A96B;
+    --primary-foreground: #1B120F;
+    --secondary: #2A1C17;
+    --secondary-foreground: #F7F1E8;
+    --muted: #2A1C17;
+    --muted-foreground: #BDAF9D;
+    --accent: #C9A96B;
+    --accent-foreground: #1B120F;
+    --border: #2A1C17;
+    --input: #2A1C17;
+    --ring: #C9A96B;
+    --destructive: #7f1d1d;
+    --destructive-foreground: #F7F1E8;
+  }
+
+  /* Hide browser default password reveal button globally */
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+  }
+
+  input::-webkit-reveal,
+  input::-webkit-clear-button {
+    display: none;
+  }
+
+  /* Content Protection */
+  img {
+    -webkit-user-drag: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+}
+
+@theme {
+  --font-sans: "Aptos", "Montserrat", sans-serif;
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  
+  --animate-infinite-scroll: infinite-scroll 40s linear infinite;
+}

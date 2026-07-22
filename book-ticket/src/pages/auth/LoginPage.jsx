@@ -11,7 +11,7 @@ import { FormButton } from '../../components/ui/FormButton';
 
 export const LoginPage = () => {
   const { t } = useTranslation();
-  const { signIn } = useAuth();
+  const { signIn, checkEmailExists } = useAuth();
   const [serverError, setServerError] = useState('');
   
   const {
@@ -28,7 +28,15 @@ export const LoginPage = () => {
     
     if (error) {
       if (error.message.includes('Invalid login credentials')) {
-        setServerError(t('auth.invalidCredentials', 'Invalid email or password.'));
+        // Check if email exists to provide a more specific error
+        const emailExists = await checkEmailExists(data.email);
+        if (emailExists === null) {
+          setServerError(t('auth.invalidCredentials', 'Invalid email or password.'));
+        } else if (!emailExists) {
+          setServerError(t('auth.emailNotRegistered', 'This email is not registered.'));
+        } else {
+          setServerError(t('auth.wrongPassword', 'Incorrect password.'));
+        }
       } else {
         setServerError(error.message);
       }

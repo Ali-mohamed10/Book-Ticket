@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
-import { Mail, Lock, User } from 'lucide-react';
+import { Mail, Lock, User, Phone } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { registerSchema } from '../../lib/validations/authSchemas';
 import { FormInput } from '../../components/ui/FormInput';
@@ -25,7 +25,7 @@ export const RegisterPage = () => {
 
   const onSubmit = async (data) => {
     setServerError('');
-    const { error } = await signUp(data.email, data.password, data.fullName);
+    const { error } = await signUp(data.email, data.password, data.fullName, data.phone);
     
     if (error) {
       if (error.message.includes('User already registered')) {
@@ -61,10 +61,19 @@ export const RegisterPage = () => {
         <FormInput
           label={t('auth.fullName', 'Full Name')}
           type="text"
-          placeholder={t('auth.fullNamePlaceholder', 'John Doe')}
+          placeholder={t('auth.fullNamePlaceholder', 'علي كريمي')}
           icon={User}
           error={errors.fullName?.message ? t(errors.fullName.message) : ''}
           {...register('fullName')}
+        />
+
+        <FormInput
+          label={t('auth.phone', 'Phone Number')}
+          type="tel"
+          placeholder={t('auth.phonePlaceholder', '+1234567890')}
+          icon={Phone}
+          error={errors.phone?.message ? t(errors.phone.message) : ''}
+          {...register('phone')}
         />
 
         <FormInput

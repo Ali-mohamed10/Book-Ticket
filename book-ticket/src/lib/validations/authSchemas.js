@@ -23,6 +23,11 @@ export const registerSchema = z
     fullName: z
       .string()
       .min(2, 'validation.fullNameMin'),
+    phone: z
+      .string()
+      .min(10, 'validation.phoneMin')
+      .max(15, 'validation.phoneMax')
+      .regex(/^\+?[0-9]+$/, 'validation.phoneInvalid'),
     email: z
       .string()
       .min(1, 'validation.emailRequired')

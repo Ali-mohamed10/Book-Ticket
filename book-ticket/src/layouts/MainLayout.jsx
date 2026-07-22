@@ -1,14 +1,18 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar';
 
 const MainLayout = () => {
+  const location = useLocation();
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
       <Navbar />
 
       {/* Main Content */}
       <main className="flex-1 container mx-auto px-4 py-8">
-        <Outlet />
+        <div key={location.pathname} className="animate-fade-in-up">
+          <Outlet />
+        </div>
       </main>
 
       {/* Footer Placeholder */}

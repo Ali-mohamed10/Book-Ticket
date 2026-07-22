@@ -13,14 +13,15 @@ import { supabase } from '../lib/supabaseClient';
  * @param {string} email
  * @param {string} password
  * @param {string} fullName
+ * @param {string} phone
  * @returns {Promise<{data, error}>}
  */
-export const signUp = async (email, password, fullName) => {
+export const signUp = async (email, password, fullName, phone) => {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      data: { full_name: fullName },
+      data: { full_name: fullName, phone: phone },
     },
   });
   return { data, error };
@@ -126,10 +127,18 @@ export const resendConfirmationEmail = async (email) => {
 };
 
 /**
- * Subscribe to auth state changes.
- * @param {function} callback
- * @returns {object} subscription
+ * Check if an email exists in the profiles table (using RPC).
+ * @param {string} email
+ * @returns {Promise<boolean>}
  */
+export const checkEmailExists = async (email) => {
+  const { data, error } = await supabase.rpc('check_email_exists', {
+    lookup_email: email
+  });
+  if (error) return null;
+  return !!data;
+};
+
 export const onAuthStateChange = (callback) => {
   return supabase.auth.onAuthStateChange(callback);
 };

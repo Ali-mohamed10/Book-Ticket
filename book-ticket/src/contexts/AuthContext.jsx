@@ -79,8 +79,8 @@ export const AuthProvider = ({ children }) => {
   }, [fetchProfile]);
 
   // Auth actions
-  const handleSignUp = useCallback(async (email, password, fullName) => {
-    return authService.signUp(email, password, fullName);
+  const handleSignUp = useCallback(async (email, password, fullName, phone) => {
+    return authService.signUp(email, password, fullName, phone);
   }, []);
 
   const handleSignIn = useCallback(async (email, password) => {
@@ -132,6 +132,7 @@ export const AuthProvider = ({ children }) => {
     updatePassword: handleUpdatePassword,
     resendConfirmation: handleResendConfirmation,
     updateProfile: handleUpdateProfile,
+    checkEmailExists: authService.checkEmailExists,
   }), [
     user,
     profile,

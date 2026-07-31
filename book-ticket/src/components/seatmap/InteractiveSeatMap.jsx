@@ -10,6 +10,7 @@
  */
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { computeStatus } from '../../utils/seatMapConstants';
 import { Table } from './Table';
 import { ZoomControls } from './ZoomControls';
 import { SeatMapTooltip } from './SeatMapTooltip';
@@ -155,7 +156,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
   const isDragging = useRef(false);
   const startDragPos = useRef({ x: 0, y: 0 });
 
-  // Merge Supabase table statuses with our layout configuration
+  // Merge Supabase table data with static layout, compute status from bookedSeats
   const mergedTables = useMemo(() => {
     const dbTables = seatMap?.tables || [];
     return TABLE_LAYOUTS.map((layout) => {
@@ -163,14 +164,17 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
       const dbTable = dbTables.find(
         (t) => t.table_code.toUpperCase() === layout.id.toUpperCase()
       );
+      const cap = dbTable?.capacity || layout.capacity;
+      const booked = dbTable?.booked_seats || 0;
       return {
         ...layout,
-        // Override status/price/id if database record is found
         db_id: dbTable?.id,
-        status: dbTable?.status || 'available',
-        // In case capacity or price is configured differently in database
+        table_code: layout.id,
         price: dbTable?.price ? parseFloat(dbTable.price) : layout.price,
-        capacity: dbTable?.capacity || layout.capacity,
+        capacity: cap,
+        bookedSeats: booked,
+        availableSeats: cap - booked,
+        status: computeStatus(booked, cap),
       };
     });
   }, [seatMap?.tables]);

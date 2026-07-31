@@ -185,15 +185,13 @@
   },
   "seatMap": {
     "available": "Available",
-    "held": "Held",
     "reserved": "Reserved",
     "sold": "Sold",
     "selected": "Selected",
-    "disabled": "Disabled",
     "legend": "Legend",
     "tableInfo": "Table Info",
     "persons": "{{count}} persons",
-    "selectTable": "Click to select",
+    "selectTable": "Click on a table to select it for booking.",
     "summary": "Booking Summary",
     "total": "Total",
     "proceedToCheckout": "Proceed to Checkout",
@@ -202,7 +200,14 @@
     "silver": "Silver",
     "standard": "Standard",
     "zoomWinPrompt": "Use Ctrl + scroll to zoom",
-    "zoomMacPrompt": "Use ⌘ + scroll to zoom"
+    "zoomMacPrompt": "Use ⌘ + scroll to zoom",
+    "categoryLabel": "Category",
+    "capacityLabel": "Capacity",
+    "bookedLabel": "Booked",
+    "availableLabel": "Available",
+    "priceLabel": "Price",
+    "statusLabel": "Status",
+    "categoriesLabel": "Categories"
   },
   "events": {
     "from": "FROM",

@@ -185,15 +185,13 @@
   },
   "seatMap": {
     "available": "متاح",
-    "held": "محجوز مؤقتاً",
-    "reserved": "محجوز",
+    "reserved": "محجوز جزئياً",
     "sold": "مباع",
     "selected": "محدد",
-    "disabled": "غير متاح",
     "legend": "دليل الخريطة",
     "tableInfo": "معلومات الطاولة",
     "persons": "{{count}} أشخاص",
-    "selectTable": "اضغط للاختيار",
+    "selectTable": "اضغط على طاولة لاختيارها للحجز.",
     "summary": "ملخص الحجز",
     "total": "الإجمالي",
     "proceedToCheckout": "متابعة الدفع",
@@ -202,7 +200,14 @@
     "silver": "فضية",
     "standard": "عادية",
     "zoomWinPrompt": "استخدم Ctrl + التمرير لتكبير الخريطة",
-    "zoomMacPrompt": "استخدم ⌘ + التمرير لتكبير الخريطة"
+    "zoomMacPrompt": "استخدم ⌘ + التمرير لتكبير الخريطة",
+    "categoryLabel": "الفئة",
+    "capacityLabel": "السعة",
+    "bookedLabel": "محجوز",
+    "availableLabel": "متاح",
+    "priceLabel": "السعر",
+    "statusLabel": "الحالة",
+    "categoriesLabel": "الفئات"
   },
   "events": {
     "from": "ابتداءً من",

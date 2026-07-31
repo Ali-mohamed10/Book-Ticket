@@ -1,22 +1,41 @@
 /**
  * Table Component
  *
- * Purpose: Render a single interactive table SVG group <g> with surrounding chairs,
- *          supporting hover, selection, database states, and keyboard accessibility.
- * Inputs: table object, isSelected, onClick
- * Output: SVG group <g> containing table, chairs, table name, and capacity text
+ * Purpose: Render a single interactive table SVG group <g> with surrounding chairs.
+ *          Category color is PERMANENT (green=VIP, gold=Gold, blue=Standard).
+ *          Status (available/reserved/sold) adds visual overlays only, never changes category color.
+ * Inputs: table object (id, x, y, category, capacity, price, status, shape, bookedSeats, availableSeats), isSelected, onClick
+ * Output: SVG group <g> containing table shape, chairs, labels, and status overlays
  * Dependencies: react-i18next
  */
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Get the Tailwind fill/stroke class prefix for a category.
+ * These colors NEVER change based on status.
+ */
+const getCategoryColorClass = (category) => {
+  switch (category) {
+    case 'vip': return 'seat-vip';
+    case 'gold': return 'seat-gold';
+    case 'silver': return 'seat-silver';
+    default: return 'seat-standard';
+  }
+};
+
 export const Table = memo(({ table, isSelected, onClick }) => {
   const { t } = useTranslation();
-  const { id, x, y, category, capacity, price, status, shape } = table;
+  const { id, x, y, category, capacity, price, status, shape, bookedSeats = 0, availableSeats } = table;
+
+  const colorClass = getCategoryColorClass(category);
+  const isSold = status === 'sold';
+  const isReserved = status === 'reserved';
+  const isClickable = !isSold;
 
   // Handles clicking or pressing space/enter
   const handleAction = (e) => {
-    if (status === 'disabled' || status === 'sold') return;
+    if (isSold) return;
     e.preventDefault();
     onClick(table);
   };
@@ -27,29 +46,38 @@ export const Table = memo(({ table, isSelected, onClick }) => {
     }
   };
 
-  // Determine SVG fill/stroke classes based on category and status
+  /**
+   * Build table shape classes.
+   * Category fill/stroke is ALWAYS applied.
+   * Status adds visual overlays on top.
+   */
   const getTableClasses = () => {
-    if (isSelected) return 'fill-seat-selected stroke-primary/70 ring-2 ring-primary';
-    switch (status) {
-      case 'sold':
-        return 'fill-seat-sold stroke-seat-sold/30 opacity-40 cursor-not-allowed';
-      case 'held':
-        return 'fill-seat-held stroke-seat-held/30';
-      case 'reserved':
-        return 'fill-seat-reserved stroke-seat-reserved/30 cursor-not-allowed';
-      case 'disabled':
-        return 'fill-seat-disabled stroke-seat-disabled/30 opacity-30 cursor-not-allowed';
-      default:
-        // Available — color based on category
-        switch (category) {
-          case 'vip':
-            return 'fill-seat-vip/25 stroke-seat-vip hover:fill-seat-vip/40 hover:scale-105';
-          case 'gold':
-            return 'fill-seat-gold/25 stroke-seat-gold hover:fill-seat-gold/40 hover:scale-105';
-          default:
-            return 'fill-seat-standard/25 stroke-seat-standard hover:fill-seat-standard/40 hover:scale-105';
-        }
+    // Base: always the category color
+    const base = `fill-${colorClass}/25 stroke-${colorClass}`;
+
+    if (isSelected) {
+      // Selected: gold outline + scale + glow, but keep category fill
+      return `fill-${colorClass}/40 stroke-seat-selected stroke-[2.5]`;
     }
+    if (isSold) {
+      // Sold: keep category color but desaturate + reduce opacity
+      return `${base} opacity-30 saturate-[0.3] cursor-not-allowed`;
+    }
+    if (isReserved) {
+      // Reserved: keep category color + amber border glow
+      return `${base} stroke-seat-reserved-border stroke-2`;
+    }
+    // Available: normal with hover effects
+    return `${base} hover:fill-${colorClass}/40 hover:scale-105`;
+  };
+
+  /**
+   * Chair colors always match the category, never the status.
+   */
+  const getChairClasses = () => {
+    if (isSelected) return `fill-${colorClass}/70 stroke-seat-selected/50`;
+    if (isSold) return `fill-${colorClass}/15 stroke-${colorClass}/10`;
+    return `fill-${colorClass}/60 stroke-${colorClass}/30`;
   };
 
   // Render chairs based on table capacity and shape layout
@@ -58,32 +86,14 @@ export const Table = memo(({ table, isSelected, onClick }) => {
     const chairWidth = 14;
     const chairHeight = 6;
     const rx = 2;
-    const styleClasses = isSelected 
-      ? 'fill-seat-selected/80 stroke-primary/50' 
-      : status === 'sold'
-        ? 'fill-seat-sold/50 stroke-seat-sold/20'
-        : status === 'held'
-          ? 'fill-seat-held/80 stroke-seat-held/20'
-          : status === 'reserved'
-            ? 'fill-seat-reserved/80 stroke-seat-reserved/20'
-            : status === 'disabled'
-              ? 'fill-seat-disabled/40 stroke-seat-disabled/20'
-              : category === 'vip'
-                ? 'fill-seat-vip/60 stroke-seat-vip/30'
-                : category === 'gold'
-                  ? 'fill-seat-gold/60 stroke-seat-gold/30'
-                  : 'fill-seat-standard/60 stroke-seat-standard/30';
+    const styleClasses = getChairClasses();
 
     if (shape === 'square') {
       // 4 chairs (top, bottom, left, right)
       chairList.push(
-        // Top
         <rect key="top" x={-chairWidth / 2} y={-26} width={chairWidth} height={chairHeight} rx={rx} className={styleClasses} />,
-        // Bottom
         <rect key="bottom" x={-chairWidth / 2} y={20} width={chairWidth} height={chairHeight} rx={rx} className={styleClasses} />,
-        // Left
         <rect key="left" x={-26} y={-chairWidth / 2} width={chairHeight} height={chairWidth} rx={rx} className={styleClasses} />,
-        // Right
         <rect key="right" x={20} y={-chairWidth / 2} width={chairHeight} height={chairWidth} rx={rx} className={styleClasses} />
       );
     } else if (shape === 'round') {
@@ -125,20 +135,17 @@ export const Table = memo(({ table, isSelected, onClick }) => {
           <rect key={`right-${idx}`} x={18} y={cy - chairWidth / 2} width={chairHeight} height={chairWidth} rx={rx} className={styleClasses} />
         );
       });
-      // Bottom
       chairList.push(
         <rect key="bottom" x={-chairWidth / 2} y={44} width={chairWidth} height={chairHeight} rx={rx} className={styleClasses} />
       );
     } else {
       // Standard rect (e.g. 2P or 4P top rows)
       if (capacity === 2) {
-        // 2 chairs (top & bottom)
         chairList.push(
           <rect key="top" x={-chairWidth / 2} y={-22} width={chairWidth} height={chairHeight} rx={rx} className={styleClasses} />,
           <rect key="bottom" x={-chairWidth / 2} y={16} width={chairWidth} height={chairHeight} rx={rx} className={styleClasses} />
         );
       } else {
-        // 4 chairs (top, bottom, left, right)
         chairList.push(
           <rect key="top" x={-chairWidth / 2} y={-26} width={chairWidth} height={chairHeight} rx={rx} className={styleClasses} />,
           <rect key="bottom" x={-chairWidth / 2} y={20} width={chairWidth} height={chairHeight} rx={rx} className={styleClasses} />,
@@ -165,36 +172,45 @@ export const Table = memo(({ table, isSelected, onClick }) => {
     } else if (shape === 'rect' && capacity === 2) {
       return <rect x={-20} y={-14} width={40} height={28} rx={4} className={commonClasses} />;
     } else {
-      // Default: square or 4P rect
       return <rect x={-18} y={-18} width={36} height={36} rx={6} className={commonClasses} />;
     }
   };
 
-  // Translate tooltip status labels
-  const getStatusLabel = () => {
-    switch (status) {
-      case 'sold': return t('seatMap.sold', 'Sold');
-      case 'held': return t('seatMap.held', 'Held');
-      case 'reserved': return t('seatMap.reserved', 'Reserved');
-      case 'disabled': return t('seatMap.disabled', 'Disabled');
-      default: return t('seatMap.available', 'Available');
-    }
-  };
+  // Label text opacity depends on status
+  const labelClasses = isSold
+    ? 'fill-[#F7F1E8]/25'
+    : isSelected
+      ? 'fill-primary-foreground'
+      : 'fill-[#F7F1E8]';
 
-  const isClickable = status === 'available' || status === 'held';
+  const subLabelClasses = isSold
+    ? 'fill-[#BDAF9D]/15'
+    : isSelected
+      ? 'fill-primary-foreground/80'
+      : 'fill-[#BDAF9D]';
 
   return (
     <g
       id={`table-${id}`}
       data-table-id={id}
-      transform={`translate(${x}, ${y})`}
+      transform={`translate(${x}, ${y})${isSelected ? ' scale(1.03)' : ''}`}
       className={`group select-none outline-none ${isClickable ? 'cursor-pointer' : 'cursor-not-allowed'}`}
       onClick={handleAction}
       onKeyDown={handleKeyDown}
       role="button"
       tabIndex={isClickable ? 0 : -1}
-      aria-label={`${t('seatMap.tableInfo', 'Table')} ${id}, ${t(`seatMap.${category}`, category)}, ${capacity} ${t('checkout.seats', 'seats')}, $${price}, ${getStatusLabel()}`}
+      aria-label={`${t('seatMap.tableInfo', 'Table')} ${id}, ${t(`seatMap.${category}`, category)}, ${capacity} ${t('checkout.seats', 'seats')}, $${price}, ${t(`seatMap.${status}`, status)}`}
     >
+      {/* Selected glow effect */}
+      {isSelected && (
+        <circle cx={0} cy={0} r={30} className="fill-none stroke-seat-selected/30 stroke-[3]" style={{ filter: 'blur(4px)' }} />
+      )}
+
+      {/* Reserved amber glow ring */}
+      {isReserved && !isSelected && (
+        <circle cx={0} cy={0} r={28} className="fill-none stroke-seat-reserved-border/25 stroke-[2]" style={{ filter: 'blur(3px)' }} />
+      )}
+
       {/* Surrounding Chairs */}
       {renderChairs()}
 
@@ -207,32 +223,20 @@ export const Table = memo(({ table, isSelected, onClick }) => {
         y={shape === 'rect_vertical' ? -6 : 1}
         textAnchor="middle"
         dominantBaseline="middle"
-        className={`font-sans font-bold select-none pointer-events-none transition-colors duration-300 text-[10px] ${
-          isSelected 
-            ? 'fill-primary-foreground' 
-            : status === 'sold'
-              ? 'fill-[#F7F1E8]/30'
-              : 'fill-[#F7F1E8]'
-        }`}
+        className={`font-sans font-bold select-none pointer-events-none transition-colors duration-300 text-[10px] ${labelClasses}`}
       >
         {id}
       </text>
 
-      {/* Capacity & Price Details */}
+      {/* Capacity & Status Detail */}
       <text
         x={0}
         y={shape === 'rect_vertical' ? 12 : 9}
         textAnchor="middle"
         dominantBaseline="middle"
-        className={`font-sans select-none pointer-events-none transition-colors duration-300 text-[6px] tracking-wider uppercase font-semibold ${
-          isSelected 
-            ? 'fill-primary-foreground/80' 
-            : status === 'sold'
-              ? 'fill-[#BDAF9D]/20'
-              : 'fill-[#BDAF9D]'
-        }`}
+        className={`font-sans select-none pointer-events-none transition-colors duration-300 text-[6px] tracking-wider uppercase font-semibold ${subLabelClasses}`}
       >
-        {capacity}P
+        {isReserved ? `${availableSeats ?? capacity - bookedSeats}/${capacity}` : `${capacity}P`}
       </text>
     </g>
   );

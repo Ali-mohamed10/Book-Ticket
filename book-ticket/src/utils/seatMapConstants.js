@@ -1,6 +1,13 @@
-// seatMapConstants.js
+/**
+ * seatMapConstants.js
+ *
+ * Purpose: Define table category colors and booking status labels.
+ *          Category colors are PERMANENT and represent table type.
+ *          Status is COMPUTED from bookedSeats vs capacity.
+ * Dependencies: none
+ */
 
-// Table categories with their theme-aware CSS variable colors
+// Table categories — permanent colors representing table TYPE
 export const TABLE_CATEGORIES = {
   vip: { label: 'seatMap.vip', colorVar: '--seat-vip' },
   gold: { label: 'seatMap.gold', colorVar: '--seat-gold' },
@@ -8,12 +15,24 @@ export const TABLE_CATEGORIES = {
   standard: { label: 'seatMap.standard', colorVar: '--seat-standard' },
 };
 
+// Table statuses — labels only, NO color override (category color is always kept)
 export const TABLE_STATUSES = {
-  available: { label: 'seatMap.available', colorVar: '--seat-available' },
-  held: { label: 'seatMap.held', colorVar: '--seat-held' },
-  reserved: { label: 'seatMap.reserved', colorVar: '--seat-reserved' },
-  sold: { label: 'seatMap.sold', colorVar: '--seat-sold' },
-  disabled: { label: 'seatMap.disabled', colorVar: '--seat-disabled' },
+  available: { label: 'seatMap.available' },
+  reserved: { label: 'seatMap.reserved' },
+  sold: { label: 'seatMap.sold' },
+};
+
+/**
+ * Compute booking status from bookedSeats and capacity.
+ *
+ * @param {number} bookedSeats - Number of seats already booked
+ * @param {number} capacity - Total seat capacity of the table
+ * @returns {'available' | 'reserved' | 'sold'}
+ */
+export const computeStatus = (bookedSeats, capacity) => {
+  if (bookedSeats <= 0) return 'available';
+  if (bookedSeats >= capacity) return 'sold';
+  return 'reserved';
 };
 
 // Non-interactive SVG element IDs to skip during parsing

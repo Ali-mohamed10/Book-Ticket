@@ -34,8 +34,8 @@ export const EventDetailsPage = () => {
 
   // Toggle table selection (memoized, enforces single table selection)
   const handleTableSelect = useCallback((table) => {
-    // Only allow selecting available tables
-    if (table.status !== 'available') return;
+    // Only block sold tables — available and reserved can be selected
+    if (table.status === 'sold') return;
 
     setSelectedTables((prev) => {
       const exists = prev.find((t) => t.id === table.id);

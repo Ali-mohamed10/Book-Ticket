@@ -43,15 +43,25 @@ export const EventDetailsPage = () => {
         // Deselect if clicked again
         return [];
       }
-      // Select ONLY the new table
-      return [table];
+      // Select ONLY the new table, defaulting selectedSeatsCount to 1
+      return [{
+        ...table,
+        selectedSeatsCount: 1
+      }];
     });
+  }, []);
+
+  // Update selected seats count for a specific table
+  const handleSeatsCountChange = useCallback((tableId, newCount) => {
+    setSelectedTables((prev) =>
+      prev.map((t) => (t.id === tableId ? { ...t, selectedSeatsCount: newCount } : t))
+    );
   }, []);
 
   // Calculate grand total for checkout card
   const grandTotal = useMemo(() => {
     const ticketTotal = selectedTables.reduce(
-      (sum, tbl) => sum + parseFloat(tbl.price || 0),
+      (sum, tbl) => sum + parseFloat(tbl.price || 0) * (tbl.selectedSeatsCount || 1),
       0
     );
     return ticketTotal + ticketTotal * SERVICE_FEE_RATE;
@@ -123,6 +133,7 @@ export const EventDetailsPage = () => {
             <BookingSummaryCard
               selectedTables={selectedTables}
               currency={event.currency || 'CAD'}
+              onSeatsCountChange={handleSeatsCountChange}
             />
             <CheckoutCard
               grandTotal={grandTotal}

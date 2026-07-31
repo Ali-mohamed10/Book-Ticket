@@ -23,11 +23,11 @@ const TABLE_LAYOUTS = [
   { id: 'T38', x: 950, y: 140, category: 'standard', capacity: 2, price: 90, shape: 'rect' },
 
   // 2. Left Row (Gold, 6P, $100)
-  { id: 'T5', x: 80, y: 350, category: 'gold', capacity: 6, price: 100, shape: 'rect_long' },
-  { id: 'T4', x: 80, y: 460, category: 'gold', capacity: 6, price: 100, shape: 'rect_long' },
-  { id: 'T3', x: 80, y: 570, category: 'gold', capacity: 6, price: 100, shape: 'rect_long' },
-  { id: 'T2', x: 80, y: 680, category: 'gold', capacity: 6, price: 100, shape: 'rect_long' },
-  { id: 'T1', x: 80, y: 790, category: 'gold', capacity: 6, price: 100, shape: 'rect_long' },
+  { id: 'T5', x: 80, y: 300, category: 'gold', capacity: 6, price: 100, shape: 'rect_long' },
+  { id: 'T4', x: 80, y: 400, category: 'gold', capacity: 6, price: 100, shape: 'rect_long' },
+  { id: 'T3', x: 80, y: 500, category: 'gold', capacity: 6, price: 100, shape: 'rect_long' },
+  { id: 'T2', x: 80, y: 600, category: 'gold', capacity: 6, price: 100, shape: 'rect_long' },
+  { id: 'T1', x: 80, y: 700, category: 'gold', capacity: 6, price: 100, shape: 'rect_long' },
 
   // 3. Top Left Grid (Green, 4P, $110)
   { id: 'T8C', x: 230, y: 240, category: 'vip', capacity: 4, price: 110, shape: 'square' },
@@ -86,10 +86,10 @@ const TABLE_LAYOUTS = [
   { id: 'T32B', x: 930, y: 740, category: 'gold', capacity: 4, price: 100, shape: 'square' },
 
   // 7. Bottom Round Tables (Gold, 6P, $100)
-  { id: 'T13', x: 440, y: 830, category: 'gold', capacity: 6, price: 100, shape: 'round' },
-  { id: 'T14', x: 440, y: 920, category: 'gold', capacity: 6, price: 100, shape: 'round' },
-  { id: 'T16', x: 610, y: 830, category: 'gold', capacity: 6, price: 100, shape: 'round' },
-  { id: 'T15', x: 610, y: 920, category: 'gold', capacity: 6, price: 100, shape: 'round' },
+  { id: 'T13', x: 370, y: 830, category: 'gold', capacity: 6, price: 100, shape: 'round' },
+  { id: 'T14', x: 370, y: 920, category: 'gold', capacity: 6, price: 100, shape: 'round' },
+  { id: 'T16', x: 490, y: 830, category: 'gold', capacity: 6, price: 100, shape: 'round' },
+  { id: 'T15', x: 490, y: 920, category: 'gold', capacity: 6, price: 100, shape: 'round' },
 
   // 8. Right Round Tables (Gold, 6P, $100)
   { id: 'T34A', x: 1050, y: 500, category: 'gold', capacity: 6, price: 100, shape: 'round' },
@@ -99,8 +99,8 @@ const TABLE_LAYOUTS = [
   { id: 'High Chairs Table', x: 1080, y: 220, category: 'gold', capacity: 16, price: 100, shape: 'high_chairs' },
 
   // 10. Bottom Blue Tables (Blue, $90)
-  { id: 'T22', x: 525, y: 910, category: 'standard', capacity: 6, price: 90, shape: 'rect' },
-  { id: 'T21', x: 525, y: 975, category: 'standard', capacity: 3, price: 90, shape: 'rect' },
+  { id: 'T22', x: 610, y: 830, category: 'standard', capacity: 6, price: 90, shape: 'rect_vertical' },
+  { id: 'T21', x: 610, y: 920, category: 'standard', capacity: 3, price: 90, shape: 'rect_vertical' },
   { id: 'T27', x: 720, y: 830, category: 'standard', capacity: 2, price: 90, shape: 'rect' },
   { id: 'T28', x: 800, y: 830, category: 'standard', capacity: 2, price: 90, shape: 'rect' },
   { id: 'T29', x: 880, y: 830, category: 'standard', capacity: 4, price: 90, shape: 'rect' },
@@ -310,7 +310,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
           </g>
 
           {/* 7. Reception / Host */}
-          <g id="reception" transform="translate(100, 810)">
+          <g id="reception" transform="translate(100, 850)">
             <rect x={-80} y={-30} width={160} height={60} rx={2} className="fill-[#1A1610] stroke-border/40 stroke-1.5" />
             <text x={-20} y={5} textAnchor="middle" className="font-sans font-bold fill-muted-foreground text-xs uppercase tracking-wider">
               {t('seatMap.reception', 'Reception')}
@@ -321,10 +321,39 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
           </g>
 
           {/* 8. Waiting Area */}
-          <g id="waiting-area" transform="translate(420, 960)">
-            <rect x={-140} y={-25} width={280} height={50} rx={4} className="fill-[#1A1610] stroke-border/30 stroke-1.5" />
+          <g id="waiting-area" transform="translate(370, 965)">
+            <rect x={-120} y={-25} width={240} height={50} rx={4} className="fill-[#1A1610] stroke-border/30 stroke-1.5" />
             <text x={0} y={5} textAnchor="middle" className="font-sans font-bold fill-muted-foreground/50 text-xs uppercase tracking-widest">
               {t('seatMap.waitingArea', 'Waiting Area')}
+            </text>
+          </g>
+
+          {/* 9. L-shaped border */}
+          <path d="M 550,800 L 550,960 L 670,960" fill="none" className="stroke-primary/20 stroke-1.5 stroke-dasharray-[4,4]" />
+
+          {/* 10. References Legend Box */}
+          <g id="references-box" transform="translate(710, 875)">
+            <rect x={0} y={0} width={280} height={90} rx={4} className="fill-[#1A1610] stroke-primary/25 stroke-1.5" />
+            <text x={15} y={22} className="font-sans font-bold fill-primary/80 text-[10px] uppercase tracking-wider">
+              {t('seatMap.referencesTitle', 'References:')}
+            </text>
+            
+            {/* vip - Green */}
+            <rect x={15} y={35} width={12} height={12} rx={2} className="fill-seat-vip/35 stroke-seat-vip" />
+            <text x={35} y={44} className="font-sans fill-muted-foreground text-[8px]">
+              {t('seatMap.vipLegendText', 'Table for 4 guests - $110')}
+            </text>
+
+            {/* gold - Gold */}
+            <rect x={15} y={52} width={12} height={12} rx={2} className="fill-seat-gold/35 stroke-seat-gold" />
+            <text x={35} y={61} className="font-sans fill-muted-foreground text-[8px]">
+              {t('seatMap.goldLegendText', 'Table for 6 guests - $100')}
+            </text>
+
+            {/* standard - Blue */}
+            <rect x={15} y={69} width={12} height={12} rx={2} className="fill-seat-standard/35 stroke-seat-standard" />
+            <text x={35} y={78} className="font-sans fill-muted-foreground text-[8px]">
+              {t('seatMap.standardLegendText', 'Table for 2 guests - $90')}
             </text>
           </g>
 

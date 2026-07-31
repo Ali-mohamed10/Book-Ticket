@@ -93,42 +93,43 @@ export const EventDetailsPage = () => {
 
   return (
     <div className="animate-fade-in-up">
-      {/* Desktop: Three-column layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_340px] gap-6">
+      {/* Desktop: Two-column layout (Left: Event Info, Right: Seat Map + Booking/Checkout subgrid) */}
+      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
         {/* Left — Event Info */}
-        <div className="order-1 lg:order-1">
+        <div>
           <EventInfoPanel event={event} />
         </div>
 
-        {/* Center — Seat Map */}
-        <div className="order-3 lg:order-2 flex flex-col gap-4">
+        {/* Right — Seat Map & Bottom Billing/Checkout Cards */}
+        <div className="flex flex-col gap-6">
+          {/* Seat Map */}
           {seatMapData ? (
-            <>
+            <div className="flex flex-col gap-4">
               <InteractiveSeatMap
                 seatMap={seatMapData}
                 onTableSelect={handleTableSelect}
                 selectedTables={selectedTables}
               />
               <SeatMapLegend />
-            </>
+            </div>
           ) : (
             <div className="flex items-center justify-center h-96 bg-secondary/10 rounded-lg border border-border text-muted-foreground">
               {t('eventDetails.noSeatMap', 'No seat map available for this event.')}
             </div>
           )}
-        </div>
 
-        {/* Right — Booking Summary + Checkout */}
-        <div className="order-2 lg:order-3 flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
-          <BookingSummaryCard
-            selectedTables={selectedTables}
-            currency={event.currency || 'CAD'}
-          />
-          <CheckoutCard
-            grandTotal={grandTotal}
-            currency={event.currency || 'CAD'}
-            disabled={selectedTables.length === 0}
-          />
+          {/* Booking Summary & Checkout Cards side-by-side */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <BookingSummaryCard
+              selectedTables={selectedTables}
+              currency={event.currency || 'CAD'}
+            />
+            <CheckoutCard
+              grandTotal={grandTotal}
+              currency={event.currency || 'CAD'}
+              disabled={selectedTables.length === 0}
+            />
+          </div>
         </div>
       </div>
 

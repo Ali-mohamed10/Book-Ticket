@@ -200,7 +200,9 @@
     "vip": "VIP",
     "gold": "ذهبية",
     "silver": "فضية",
-    "standard": "عادية"
+    "standard": "عادية",
+    "zoomWinPrompt": "استخدم Ctrl + التمرير لتكبير الخريطة",
+    "zoomMacPrompt": "استخدم ⌘ + التمرير لتكبير الخريطة"
   },
   "events": {
     "from": "ابتداءً من",

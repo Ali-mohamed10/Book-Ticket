@@ -116,6 +116,10 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
   const [hoveredTable, setHoveredTable] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
+  // Zoom Scroll Overlay prompt state
+  const [showScrollOverlay, setShowScrollOverlay] = useState(false);
+  const overlayTimeoutRef = useRef(null);
+
   // Pan & Zoom state
   const [transform, setTransform] = useState({ scale: 0.9, x: 50, y: 20 });
   const isDragging = useRef(false);
@@ -160,18 +164,37 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     if (!container) return;
 
     const handleWheel = (e) => {
-      e.preventDefault();
-      const scaleAmount = -e.deltaY * 0.001;
-      setTransform((prev) => {
-        let newScale = prev.scale * (1 + scaleAmount);
-        newScale = Math.min(Math.max(0.4, newScale), 3);
-        return { ...prev, scale: newScale };
-      });
+      // Only zoom if Ctrl key (or Cmd key on Mac) is pressed
+      const isMac = navigator.platform.indexOf('Mac') > -1;
+      const modifierPressed = isMac ? e.metaKey : e.ctrlKey;
+
+      if (modifierPressed) {
+        e.preventDefault();
+        const scaleAmount = -e.deltaY * 0.001;
+        setTransform((prev) => {
+          let newScale = prev.scale * (1 + scaleAmount);
+          newScale = Math.min(Math.max(0.4, newScale), 3);
+          return { ...prev, scale: newScale };
+        });
+        setShowScrollOverlay(false);
+      } else {
+        // Show prompt overlay since they scrolled without modifier key
+        setShowScrollOverlay(true);
+        if (overlayTimeoutRef.current) {
+          clearTimeout(overlayTimeoutRef.current);
+        }
+        overlayTimeoutRef.current = setTimeout(() => {
+          setShowScrollOverlay(false);
+        }, 1500);
+      }
     };
 
     container.addEventListener('wheel', handleWheel, { passive: false });
     return () => {
       container.removeEventListener('wheel', handleWheel);
+      if (overlayTimeoutRef.current) {
+        clearTimeout(overlayTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -390,6 +413,17 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
           })}
         </svg>
       </div>
+
+      {/* Zoom Scroll modifier overlay prompt */}
+      {showScrollOverlay && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/65 backdrop-blur-xs transition-opacity duration-300 pointer-events-none">
+          <div className="bg-[#1A1610]/95 border border-primary/25 px-5 py-3 rounded-lg text-sm text-[#F7F1E8] font-bold shadow-lg animate-fade-in-up">
+            {navigator.platform.indexOf('Mac') > -1 
+              ? t('seatMap.zoomMacPrompt', 'Use ⌘ + scroll to zoom')
+              : t('seatMap.zoomWinPrompt', 'Use Ctrl + scroll to zoom')}
+          </div>
+        </div>
+      )}
 
       {/* Hover Tooltip Overlay */}
       <SeatMapTooltip

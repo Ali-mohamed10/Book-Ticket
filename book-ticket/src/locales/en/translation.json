@@ -200,7 +200,9 @@
     "vip": "VIP",
     "gold": "Gold",
     "silver": "Silver",
-    "standard": "Standard"
+    "standard": "Standard",
+    "zoomWinPrompt": "Use Ctrl + scroll to zoom",
+    "zoomMacPrompt": "Use ⌘ + scroll to zoom"
   },
   "events": {
     "from": "FROM",

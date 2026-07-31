@@ -8,7 +8,7 @@
  * Output: Interactive SVG Map with custom rooms and room coordinates
  * Dependencies: react, lucide-react, react-i18next
  */
-import { useState, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Table } from './Table';
 import { ZoomControls } from './ZoomControls';
@@ -154,14 +154,26 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     setTransform({ scale: 0.9, x: 50, y: 20 });
   }, []);
 
-  // Handlers for mouse-wheel zoom
-  const handleWheel = (e) => {
-    e.preventDefault();
-    const scaleAmount = -e.deltaY * 0.001;
-    let newScale = transform.scale * (1 + scaleAmount);
-    newScale = Math.min(Math.max(0.4, newScale), 3);
-    setTransform((prev) => ({ ...prev, scale: newScale }));
-  };
+  // Handlers for mouse-wheel zoom (passive: false attached manually via useEffect)
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e) => {
+      e.preventDefault();
+      const scaleAmount = -e.deltaY * 0.001;
+      setTransform((prev) => {
+        let newScale = prev.scale * (1 + scaleAmount);
+        newScale = Math.min(Math.max(0.4, newScale), 3);
+        return { ...prev, scale: newScale };
+      });
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
 
   // Handlers for panning
   const handleMouseDown = (e) => {
@@ -222,7 +234,6 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     <div
       className="relative w-full h-[600px] bg-[#12100B] border border-border rounded-lg overflow-hidden select-none"
       ref={containerRef}
-      onWheel={handleWheel}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}

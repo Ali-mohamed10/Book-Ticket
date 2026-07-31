@@ -1,10 +1,10 @@
 /**
  * SeatMapTooltip Component
  *
- * Purpose: Display hover tooltip with table details including category,
- *          capacity, booked/available seats, price, and computed status.
- * Inputs: table object, x, y position, visible boolean
- * Output: Positioned tooltip overlay
+ * Purpose: Display hover tooltip with table details.
+ *          Supports selecting table and modifying seat counts directly inside the tooltip.
+ * Inputs: table object, x/y coords, visible boolean, callbacks (onSeatsCountChange, onTableSelect, onMouseEnter, onMouseLeave)
+ * Output: Interactive positioned tooltip overlay
  * Dependencies: react-i18next, seatMapConstants
  */
 import { useTranslation } from 'react-i18next';
@@ -23,7 +23,16 @@ const getStatusBadgeColor = (status) => {
   }
 };
 
-export const SeatMapTooltip = ({ table, x, y, visible }) => {
+export const SeatMapTooltip = ({
+  table,
+  x,
+  y,
+  visible,
+  onSeatsCountChange,
+  onTableSelect,
+  onMouseEnter,
+  onMouseLeave
+}) => {
   const { t } = useTranslation();
 
   if (!visible || !table) return null;
@@ -31,16 +40,20 @@ export const SeatMapTooltip = ({ table, x, y, visible }) => {
   const category = TABLE_CATEGORIES[table.category];
   const bookedSeats = table.bookedSeats || 0;
   const availableSeats = table.availableSeats ?? (table.capacity - bookedSeats);
+  const isSelected = table.isSelected;
+  const isSold = table.status === 'sold';
 
   return (
     <div 
-      className="absolute z-50 pointer-events-none bg-[#1A1610]/95 backdrop-blur-md text-[#F7F1E8] border border-primary/20 shadow-xl rounded-lg p-3 min-w-44 transition-opacity duration-200"
+      className="absolute z-50 pointer-events-auto bg-[#1A1610]/95 backdrop-blur-md text-[#F7F1E8] border border-primary/20 shadow-xl rounded-lg p-3 min-w-48 transition-opacity duration-200"
       style={{
         left: `${x}px`,
         top: `${y}px`,
-        transform: 'translate(-50%, -120%)',
+        transform: 'translate(-50%, -105%)', // slightly adjusted so there's less gap
         opacity: visible ? 1 : 0
       }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       {/* Header: Table code + Status badge */}
       <div className="flex justify-between items-start mb-2 border-b border-primary/10 pb-2">
@@ -83,11 +96,82 @@ export const SeatMapTooltip = ({ table, x, y, visible }) => {
         </span>
       </div>
       
-      {/* Price */}
-      <div className="flex justify-between text-sm mt-2 pt-2 border-t border-primary/10">
+      {/* Price per seat */}
+      <div className="flex justify-between text-sm mb-1">
         <span className="text-[#BDAF9D]">{t('seatMap.priceLabel', 'Price')}</span>
         <span className="font-bold text-primary">${table.price}</span>
       </div>
+
+      {/* Select / Seats adjustment block */}
+      {!isSold && (
+        <div className="mt-3 pt-3 border-t border-primary/10">
+          {isSelected ? (
+            <div className="space-y-3">
+              {/* Seats selector row */}
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-[#BDAF9D]">{t('seatMap.seatsToBook', 'Book Seats')}</span>
+                <div className="flex items-center bg-background border border-border rounded-lg p-0.5 shadow-sm">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSeatsCountChange?.(table.id, Math.max(1, table.selectedSeatsCount - 1));
+                    }}
+                    disabled={table.selectedSeatsCount <= 1}
+                    className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-secondary/40 text-foreground disabled:opacity-20 disabled:hover:bg-transparent transition-colors font-bold"
+                  >
+                    -
+                  </button>
+                  <span className="w-7 text-center text-xs font-bold text-foreground">
+                    {table.selectedSeatsCount}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSeatsCountChange?.(table.id, Math.min(availableSeats, table.selectedSeatsCount + 1));
+                    }}
+                    disabled={table.selectedSeatsCount >= availableSeats}
+                    className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-secondary/40 text-foreground disabled:opacity-20 disabled:hover:bg-transparent transition-colors font-bold"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Total Price */}
+              <div className="flex justify-between items-center text-xs font-bold text-primary">
+                <span>{t('seatMap.total', 'Total')}</span>
+                <span>${(Number(table.price) * table.selectedSeatsCount).toFixed(2)}</span>
+              </div>
+
+              {/* Deselect button */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onTableSelect?.(table);
+                }}
+                className="w-full bg-destructive/10 hover:bg-destructive/25 border border-destructive/20 text-destructive text-xs py-1.5 rounded font-bold transition-colors"
+              >
+                {t('seatMap.deselectTable', 'Deselect Table')}
+              </button>
+            </div>
+          ) : (
+            /* Select table button */
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onTableSelect?.(table);
+              }}
+              className="w-full bg-primary text-primary-foreground hover:opacity-90 text-xs py-2 rounded font-bold transition-opacity"
+            >
+              {t('seatMap.selectTableBtn', 'Select Table')}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 };

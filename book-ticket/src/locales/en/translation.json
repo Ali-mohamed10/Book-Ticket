@@ -207,7 +207,10 @@
     "availableLabel": "Available",
     "priceLabel": "Price",
     "statusLabel": "Status",
-    "categoriesLabel": "Categories"
+    "categoriesLabel": "Categories",
+    "seatsToBook": "Book Seats",
+    "deselectTable": "Deselect Table",
+    "selectTableBtn": "Select Table"
   },
   "events": {
     "from": "FROM",

@@ -207,7 +207,10 @@
     "availableLabel": "متاح",
     "priceLabel": "السعر",
     "statusLabel": "الحالة",
-    "categoriesLabel": "الفئات"
+    "categoriesLabel": "الفئات",
+    "seatsToBook": "احجز مقاعد",
+    "deselectTable": "إلغاء اختيار الطاولة",
+    "selectTableBtn": "اختر الطاولة"
   },
   "events": {
     "from": "ابتداءً من",

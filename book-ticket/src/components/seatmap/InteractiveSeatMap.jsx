@@ -109,9 +109,12 @@ const TABLE_LAYOUTS = [
   { id: 'T31', x: 1055, y: 730, category: 'standard', capacity: 7, price: 90, shape: 'rect_vertical' },
 ];
 
-export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = [] }) => {
+export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = [], onSeatsCountChange }) => {
   const { t } = useTranslation();
   const containerRef = useRef(null);
+
+  // Tooltip hover management refs
+  const tooltipTimeoutRef = useRef(null);
 
   // Tooltip state
   const [hoveredTable, setHoveredTable] = useState(null);
@@ -123,6 +126,15 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
 
   // Fullscreen state
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (tooltipTimeoutRef.current) {
+        clearTimeout(tooltipTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const toggleFullscreen = useCallback(() => {
     const container = containerRef.current;
@@ -261,30 +273,71 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     isDragging.current = false;
   };
 
-  // Hover states for tooltips
-  const handleTableMouseEnter = useCallback((table, e) => {
-    setHoveredTable(table);
-  }, []);
+  // Merge hover table with current select count
+  const hoveredTableMerged = useMemo(() => {
+    if (!hoveredTable) return null;
+    const selected = selectedTables.find(
+      (t) => t.id.toUpperCase() === hoveredTable.id.toUpperCase()
+    );
+    const dbTables = seatMap?.tables || [];
+    const dbTable = dbTables.find(
+      (t) => t.table_code.toUpperCase() === hoveredTable.id.toUpperCase()
+    );
+    const cap = dbTable?.capacity || hoveredTable.capacity;
+    const booked = dbTable?.booked_seats || 0;
+    const maxAvailable = cap - booked;
 
-  const handleTableMouseMove = useCallback((e) => {
+    return {
+      ...hoveredTable,
+      selectedSeatsCount: selected ? (selected.selectedSeatsCount || 1) : 0,
+      isSelected: !!selected,
+      availableSeats: maxAvailable,
+      bookedSeats: booked,
+      capacity: cap,
+      price: dbTable?.price ? parseFloat(dbTable.price) : hoveredTable.price,
+    };
+  }, [hoveredTable, selectedTables, seatMap?.tables]);
+
+  // Hover states for tooltips with timed buffers to allow moving mouse into tooltip
+  const handleTableMouseEnter = useCallback((table, e) => {
+    if (tooltipTimeoutRef.current) {
+      clearTimeout(tooltipTimeoutRef.current);
+    }
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
+    
+    // Only lock position on first enter of a new table to prevent jitter
     setTooltipPos({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     });
+    
+    setHoveredTable(table);
   }, []);
 
   const handleTableMouseLeave = useCallback(() => {
-    setHoveredTable(null);
+    tooltipTimeoutRef.current = setTimeout(() => {
+      setHoveredTable(null);
+    }, 250);
+  }, []);
+
+  const handleTooltipMouseEnter = useCallback(() => {
+    if (tooltipTimeoutRef.current) {
+      clearTimeout(tooltipTimeoutRef.current);
+    }
+  }, []);
+
+  const handleTooltipMouseLeave = useCallback(() => {
+    tooltipTimeoutRef.current = setTimeout(() => {
+      setHoveredTable(null);
+    }, 250);
   }, []);
 
   // Selection callback to page
   const handleTableClick = useCallback((table) => {
-    // If table doesn't have a database ID, construct a temporary model so page functions don't crash
     const finalTable = {
       id: table.db_id || table.id,
-      table_code: table.id,
+      table_code: table.table_code || table.id,
       capacity: table.capacity,
       price: table.price,
       category: table.category,
@@ -442,7 +495,6 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
               <g
                 key={table.id}
                 onMouseEnter={(e) => handleTableMouseEnter(table, e)}
-                onMouseMove={handleTableMouseMove}
                 onMouseLeave={handleTableMouseLeave}
               >
                 <Table
@@ -469,10 +521,14 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
 
       {/* Hover Tooltip Overlay */}
       <SeatMapTooltip
-        table={hoveredTable}
+        table={hoveredTableMerged}
         x={tooltipPos.x}
         y={tooltipPos.y}
         visible={!!hoveredTable}
+        onSeatsCountChange={onSeatsCountChange}
+        onTableSelect={handleTableClick}
+        onMouseEnter={handleTooltipMouseEnter}
+        onMouseLeave={handleTooltipMouseLeave}
       />
     </div>
   );

@@ -120,6 +120,36 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
   const [showScrollOverlay, setShowScrollOverlay] = useState(false);
   const overlayTimeoutRef = useRef(null);
 
+  // Fullscreen state
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    if (!document.fullscreenElement) {
+      container.requestFullscreen().then(() => {
+        setIsFullscreen(true);
+      }).catch((err) => {
+        console.error('Error attempting to enable fullscreen:', err.message);
+      });
+    } else {
+      document.exitFullscreen().then(() => {
+        setIsFullscreen(false);
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
   // Pan & Zoom state
   const [transform, setTransform] = useState({ scale: 0.9, x: 50, y: 20 });
   const isDragging = useRef(false);
@@ -255,18 +285,20 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
 
   return (
     <div
-      className="relative w-full h-[600px] bg-[#12100B] border border-border rounded-lg overflow-hidden select-none"
+      className={`relative w-full bg-[#12100B] border border-border rounded-lg overflow-hidden select-none transition-all duration-300 ${isFullscreen ? 'h-full border-none rounded-none' : 'h-[600px]'}`}
       ref={containerRef}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
-      {/* Zoom and Reset Controls */}
+      {/* Zoom, Reset and Fullscreen Controls */}
       <ZoomControls
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
         onReset={handleResetView}
+        isFullscreen={isFullscreen}
+        onToggleFullscreen={toggleFullscreen}
       />
 
       {/* SVG Canvas */}

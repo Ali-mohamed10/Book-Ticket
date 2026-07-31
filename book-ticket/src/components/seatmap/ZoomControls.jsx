@@ -1,16 +1,16 @@
 /**
  * ZoomControls Component
  *
- * Purpose: Render UI controls (+, -, Reset) for zooming and panning the seating map.
- * Inputs: onZoomIn, onZoomOut, onReset
+ * Purpose: Render UI controls (Zoom In, Zoom Out, Reset, Fullscreen) for the seating map.
+ * Inputs: onZoomIn, onZoomOut, onReset, isFullscreen, onToggleFullscreen
  * Output: Glassmorphic button overlay
  * Dependencies: lucide-react, react-i18next
  */
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize, Minimize, RotateCcw } from 'lucide-react';
 
-export const ZoomControls = memo(({ onZoomIn, onZoomOut, onReset }) => {
+export const ZoomControls = memo(({ onZoomIn, onZoomOut, onReset, isFullscreen, onToggleFullscreen }) => {
   const { t } = useTranslation();
 
   return (
@@ -42,7 +42,21 @@ export const ZoomControls = memo(({ onZoomIn, onZoomOut, onReset }) => {
         title={t('seatMap.resetView', 'Reset View')}
         aria-label={t('seatMap.resetView', 'Reset View')}
       >
-        <Maximize className="w-4 h-4" />
+        <RotateCcw className="w-4 h-4" />
+      </button>
+
+      {/* Fullscreen */}
+      <button
+        onClick={onToggleFullscreen}
+        className="w-9 h-9 flex items-center justify-center bg-secondary/20 hover:bg-secondary/40 text-foreground border border-border/50 rounded transition-colors animate-pulse-subtle"
+        title={isFullscreen ? t('seatMap.exitFullscreen', 'Exit Fullscreen') : t('seatMap.enterFullscreen', 'Fullscreen')}
+        aria-label={isFullscreen ? t('seatMap.exitFullscreen', 'Exit Fullscreen') : t('seatMap.enterFullscreen', 'Fullscreen')}
+      >
+        {isFullscreen ? (
+          <Minimize className="w-4 h-4" />
+        ) : (
+          <Maximize className="w-4 h-4" />
+        )}
       </button>
     </div>
   );

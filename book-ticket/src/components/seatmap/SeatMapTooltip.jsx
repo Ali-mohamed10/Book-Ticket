@@ -115,7 +115,7 @@ export const SeatMapTooltip = ({
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onSeatsCountChange?.(table.id, Math.max(1, table.selectedSeatsCount - 1));
+                      onSeatsCountChange?.(table.db_id || table.id, Math.max(1, table.selectedSeatsCount - 1));
                     }}
                     disabled={table.selectedSeatsCount <= 1}
                     className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-secondary/40 text-foreground disabled:opacity-20 disabled:hover:bg-transparent transition-colors font-bold"
@@ -129,7 +129,7 @@ export const SeatMapTooltip = ({
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onSeatsCountChange?.(table.id, Math.min(availableSeats, table.selectedSeatsCount + 1));
+                      onSeatsCountChange?.(table.db_id || table.id, Math.min(availableSeats, table.selectedSeatsCount + 1));
                     }}
                     disabled={table.selectedSeatsCount >= availableSeats}
                     className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-secondary/40 text-foreground disabled:opacity-20 disabled:hover:bg-transparent transition-colors font-bold"

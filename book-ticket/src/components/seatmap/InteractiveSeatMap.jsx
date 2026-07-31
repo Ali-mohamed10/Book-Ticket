@@ -194,9 +194,10 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     if (!container) return;
 
     const handleWheel = (e) => {
-      // Only zoom if Ctrl key (or Cmd key on Mac) is pressed
+      // If we are in fullscreen, we do not require Ctrl/Cmd modifier to zoom
+      const isFullscreenActive = !!document.fullscreenElement;
       const isMac = navigator.platform.indexOf('Mac') > -1;
-      const modifierPressed = isMac ? e.metaKey : e.ctrlKey;
+      const modifierPressed = isFullscreenActive || (isMac ? e.metaKey : e.ctrlKey);
 
       if (modifierPressed) {
         e.preventDefault();
@@ -208,7 +209,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
         });
         setShowScrollOverlay(false);
       } else {
-        // Show prompt overlay since they scrolled without modifier key
+        // Show prompt overlay since they scrolled without modifier key (only in non-fullscreen)
         setShowScrollOverlay(true);
         if (overlayTimeoutRef.current) {
           clearTimeout(overlayTimeoutRef.current);

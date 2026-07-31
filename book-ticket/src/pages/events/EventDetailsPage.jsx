@@ -15,6 +15,7 @@ import { useEventBySlug } from '../../hooks/useEvents';
 import { EventInfoPanel } from '../../components/event/EventInfoPanel';
 import { EventDetailsSkeleton } from '../../components/event/EventDetailsSkeleton';
 import { InteractiveSeatMap } from '../../components/seatmap/InteractiveSeatMap';
+import { SeatMapLegend } from '../../components/seatmap/SeatMapLegend';
 import { BookingSummaryCard } from '../../components/booking/BookingSummaryCard';
 import { CheckoutCard } from '../../components/booking/CheckoutCard';
 
@@ -109,6 +110,7 @@ export const EventDetailsPage = () => {
                 onTableSelect={handleTableSelect}
                 selectedTables={selectedTables}
               />
+              <SeatMapLegend />
             </div>
           ) : (
             <div className="flex items-center justify-center h-96 bg-secondary/10 rounded-lg border border-border text-muted-foreground">

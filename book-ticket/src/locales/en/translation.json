@@ -243,6 +243,7 @@
     "ticketPrice": "Ticket Price",
     "seats": "seats",
     "each": "each",
-    "totalSeats": "Total Seats Booked"
+    "totalSeats": "Total Seats Booked",
+    "seatsSelected": "{{count}} seats selected"
   }
 }

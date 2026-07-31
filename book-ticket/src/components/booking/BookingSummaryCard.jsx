@@ -2,20 +2,20 @@
  * BookingSummaryCard
  *
  * Purpose: Enhanced booking summary for the public Event Details page.
- *          Displays selected tables, seat selection counters (- / +),
+ *          Displays selected tables, number of selected seats,
  *          pricing breakdown, service fee, and grand total.
- * Input: selectedTables (array), currency (string), onSeatsCountChange (function)
+ * Input: selectedTables (array), currency (string)
  * Output: Rendered booking summary card
  * Dependencies: react-i18next, lucide-react
  */
 import { useMemo, memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Users, Minus, Plus } from 'lucide-react';
+import { Users } from 'lucide-react';
 
 // Service fee percentage
 const SERVICE_FEE_RATE = 0.05;
 
-const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD', onSeatsCountChange }) => {
+const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD' }) => {
   const { t } = useTranslation();
 
   // Memoize price calculations
@@ -49,7 +49,6 @@ const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD', onSeat
         ) : (
           <div className="space-y-3">
             {selectedTables.map((table) => {
-              const maxAvailable = table.availableSeats ?? (table.capacity - (table.bookedSeats || 0));
               const currentSeats = table.selectedSeatsCount || 1;
 
               return (
@@ -78,46 +77,20 @@ const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD', onSeat
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Users className="w-3.5 h-3.5" />
                         <span>
-                          {t('seatMap.availableSeats', '{{count}} seats available', { count: maxAvailable })}
+                          {t('checkout.seatsSelected', '{{count}} seats selected', { count: currentSeats })}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Seat counter and Price wrapper */}
+                  {/* Price display wrapper */}
                   <div className="flex items-center justify-between sm:justify-end gap-6 border-t sm:border-t-0 border-border/50 pt-3 sm:pt-0">
-                    {/* Seats selector controls */}
-                    <div className="flex items-center bg-background border border-border rounded-lg p-0.5 shadow-sm">
-                      <button
-                        type="button"
-                        onClick={() => onSeatsCountChange?.(table.id, Math.max(1, currentSeats - 1))}
-                        disabled={currentSeats <= 1}
-                        className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-secondary/40 text-foreground disabled:opacity-20 disabled:hover:bg-transparent transition-colors"
-                        aria-label="Decrease seats"
-                      >
-                        <Minus className="w-3.5 h-3.5" />
-                      </button>
-                      <span className="w-8 text-center text-sm font-bold text-foreground">
-                        {currentSeats}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => onSeatsCountChange?.(table.id, Math.min(maxAvailable, currentSeats + 1))}
-                        disabled={currentSeats >= maxAvailable}
-                        className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-secondary/40 text-foreground disabled:opacity-20 disabled:hover:bg-transparent transition-colors"
-                        aria-label="Increase seats"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-
-                    {/* Price display */}
                     <div className="text-right">
                       <span className="font-bold text-foreground block">
                         ${(Number(table.price) * currentSeats).toFixed(2)}
                       </span>
                       <span className="text-[10px] text-muted-foreground block">
-                        ${Number(table.price).toFixed(2)} {t('checkout.each', 'each')}
+                        ${Number(table.price).toFixed(2)} x {currentSeats}
                       </span>
                     </div>
                   </div>

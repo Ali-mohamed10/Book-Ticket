@@ -287,7 +287,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
           {/* 4. Control Room */}
           <g id="control-room" transform="translate(90, 80)">
             <rect x={-70} y={-40} width={140} height={80} rx={4} className="fill-[#1A1610] stroke-border/40 stroke-1.5" />
-            <text x={0} y={-10} textAnchor="middle" className="font-sans font-bold fill-muted-foreground text-xs uppercase tracking-wider">
+            <text x={0} y={-10} textAnchor="middle" className="font-sans font-bold fill-[#BDAF9D] text-xs uppercase tracking-wider">
               {t('seatMap.controlRoom', 'Control Room')}
             </text>
             <rect x={-40} y={15} width={80} height={10} rx={2} className="fill-[#12100B] stroke-border/20" />
@@ -296,7 +296,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
           {/* 5. Wash Room */}
           <g id="wash-room" transform="translate(1110, 380)">
             <rect x={-60} y={-30} width={120} height={60} rx={4} className="fill-[#1A1610] stroke-border/40 stroke-1.5" />
-            <text x={0} y={0} textAnchor="middle" dominantBaseline="middle" className="font-sans font-bold fill-muted-foreground text-xs uppercase tracking-wider">
+            <text x={0} y={0} textAnchor="middle" dominantBaseline="middle" className="font-sans font-bold fill-[#BDAF9D] text-xs uppercase tracking-wider">
               {t('seatMap.washRoom', 'Wash Room')}
             </text>
           </g>
@@ -304,7 +304,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
           {/* 6. Hospitality Corner */}
           <g id="hospitality-corner" transform="translate(1135, 570)">
             <rect x={-40} y={-120} width={80} height={240} rx={40} className="fill-[#1A1610] stroke-primary/15 stroke-1.5" />
-            <text x={0} y={0} transform="rotate(-90)" textAnchor="middle" dominantBaseline="middle" className="font-sans font-bold fill-primary/20 text-sm uppercase tracking-[0.15em]">
+            <text x={0} y={0} transform="rotate(-90)" textAnchor="middle" dominantBaseline="middle" className="font-sans font-bold fill-primary/25 text-sm uppercase tracking-[0.15em]">
               {t('seatMap.hospitalityCorner', 'Hospitality Corner')}
             </text>
           </g>
@@ -312,18 +312,18 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
           {/* 7. Reception / Host */}
           <g id="reception" transform="translate(100, 850)">
             <rect x={-80} y={-30} width={160} height={60} rx={2} className="fill-[#1A1610] stroke-border/40 stroke-1.5" />
-            <text x={-20} y={5} textAnchor="middle" className="font-sans font-bold fill-muted-foreground text-xs uppercase tracking-wider">
+            <text x={-20} y={5} textAnchor="middle" className="font-sans font-bold fill-[#BDAF9D] text-xs uppercase tracking-wider">
               {t('seatMap.reception', 'Reception')}
             </text>
             {/* Host stool */}
             <circle cx={50} cy={10} r={10} className="fill-[#12100B] stroke-border/20" />
-            <text x={50} y={11} textAnchor="middle" className="font-sans font-semibold fill-muted-foreground/60 text-[6px]">HOST</text>
+            <text x={50} y={11} textAnchor="middle" className="font-sans font-semibold fill-[#BDAF9D]/60 text-[6px]">HOST</text>
           </g>
 
           {/* 8. Waiting Area */}
           <g id="waiting-area" transform="translate(370, 965)">
             <rect x={-120} y={-25} width={240} height={50} rx={4} className="fill-[#1A1610] stroke-border/30 stroke-1.5" />
-            <text x={0} y={5} textAnchor="middle" className="font-sans font-bold fill-muted-foreground/50 text-xs uppercase tracking-widest">
+            <text x={0} y={5} textAnchor="middle" className="font-sans font-bold fill-[#BDAF9D]/75 text-xs uppercase tracking-widest">
               {t('seatMap.waitingArea', 'Waiting Area')}
             </text>
           </g>
@@ -340,19 +340,19 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
             
             {/* vip - Green */}
             <rect x={15} y={35} width={12} height={12} rx={2} className="fill-seat-vip/35 stroke-seat-vip" />
-            <text x={35} y={44} className="font-sans fill-muted-foreground text-[8px]">
+            <text x={35} y={44} className="font-sans fill-[#BDAF9D] text-[8px]">
               {t('seatMap.vipLegendText', 'Table for 4 guests - $110')}
             </text>
 
             {/* gold - Gold */}
             <rect x={15} y={52} width={12} height={12} rx={2} className="fill-seat-gold/35 stroke-seat-gold" />
-            <text x={35} y={61} className="font-sans fill-muted-foreground text-[8px]">
+            <text x={35} y={61} className="font-sans fill-[#BDAF9D] text-[8px]">
               {t('seatMap.goldLegendText', 'Table for 6 guests - $100')}
             </text>
 
             {/* standard - Blue */}
             <rect x={15} y={69} width={12} height={12} rx={2} className="fill-seat-standard/35 stroke-seat-standard" />
-            <text x={35} y={78} className="font-sans fill-muted-foreground text-[8px]">
+            <text x={35} y={78} className="font-sans fill-[#BDAF9D] text-[8px]">
               {t('seatMap.standardLegendText', 'Table for 2 guests - $90')}
             </text>
           </g>

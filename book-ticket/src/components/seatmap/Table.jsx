@@ -211,8 +211,8 @@ export const Table = memo(({ table, isSelected, onClick }) => {
           isSelected 
             ? 'fill-primary-foreground' 
             : status === 'sold'
-              ? 'fill-muted-foreground/50'
-              : 'fill-foreground'
+              ? 'fill-[#F7F1E8]/30'
+              : 'fill-[#F7F1E8]'
         }`}
       >
         {id}
@@ -228,8 +228,8 @@ export const Table = memo(({ table, isSelected, onClick }) => {
           isSelected 
             ? 'fill-primary-foreground/80' 
             : status === 'sold'
-              ? 'fill-muted-foreground/30'
-              : 'fill-muted-foreground'
+              ? 'fill-[#BDAF9D]/20'
+              : 'fill-[#BDAF9D]'
         }`}
       >
         {capacity}P

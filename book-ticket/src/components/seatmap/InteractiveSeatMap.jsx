@@ -194,6 +194,11 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     if (!container) return;
 
     const handleWheel = (e) => {
+      // If the scroll is mostly horizontal (swiping left/right), ignore it
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) {
+        return;
+      }
+
       // If we are in fullscreen, we do not require Ctrl/Cmd modifier to zoom
       const isFullscreenActive = !!document.fullscreenElement;
       const isMac = navigator.platform.indexOf('Mac') > -1;

@@ -9,7 +9,7 @@ export const DashboardPage = () => {
     <div className="flex flex-col gap-6">
       <div className="border-b border-border pb-4">
         <h1 className="text-3xl font-bold font-sans text-primary">
-          {t('admin.title', 'Dashboard')}
+          {t('admin.title', 'Overview')}
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
           {t('admin.welcomeUser', 'Welcome back, {{name}}! You are logged in as {{role}}.', {

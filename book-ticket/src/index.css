@@ -60,6 +60,19 @@
     --ring: #C9A96B;
     --destructive: #ef4444;
     --destructive-foreground: #F7F1E8;
+
+    /* Seat Map Colors */
+    --seat-vip: #00a86b;
+    --seat-gold: #d4af37;
+    --seat-silver: #c0c0c0;
+    --seat-standard: #1e90ff;
+    --seat-available: var(--seat-standard);
+    --seat-held: #ffa500;
+    --seat-reserved: #ff6347;
+    --seat-sold: #555555;
+    --seat-disabled: #333333;
+    --seat-selected: #C9A96B;
+    --seat-hover-opacity: 0.8;
   }
 
   .dark {
@@ -78,6 +91,19 @@
     --ring: #C9A96B;
     --destructive: #7f1d1d;
     --destructive-foreground: #F7F1E8;
+
+    /* Seat Map Colors */
+    --seat-vip: #00a86b;
+    --seat-gold: #d4af37;
+    --seat-silver: #c0c0c0;
+    --seat-standard: #1e90ff;
+    --seat-available: var(--seat-standard);
+    --seat-held: #ffa500;
+    --seat-reserved: #ff6347;
+    --seat-sold: #555555;
+    --seat-disabled: #333333;
+    --seat-selected: #C9A96B;
+    --seat-hover-opacity: 0.8;
   }
 
   /* Hide browser default password reveal button globally */
@@ -121,6 +147,17 @@
   --color-ring: var(--ring);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  
+  --color-seat-vip: var(--seat-vip);
+  --color-seat-gold: var(--seat-gold);
+  --color-seat-silver: var(--seat-silver);
+  --color-seat-standard: var(--seat-standard);
+  --color-seat-available: var(--seat-available);
+  --color-seat-held: var(--seat-held);
+  --color-seat-reserved: var(--seat-reserved);
+  --color-seat-sold: var(--seat-sold);
+  --color-seat-disabled: var(--seat-disabled);
+  --color-seat-selected: var(--seat-selected);
   
   --animate-infinite-scroll: infinite-scroll 40s linear infinite;
   --animate-fade-in-up: fade-in-up 0.4s ease-out forwards;

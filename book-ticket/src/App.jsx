@@ -19,7 +19,15 @@ const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage'));
 const EmailVerificationPage = lazy(() => import('./pages/auth/EmailVerificationPage'));
 
 // Lazy load admin pages
+const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
 const DashboardPage = lazy(() => import('./pages/admin/DashboardPage'));
+const SeatMapsListPage = lazy(() => import('./pages/admin/SeatMapsListPage'));
+const SeatMapEditorPage = lazy(() => import('./pages/admin/SeatMapEditorPage'));
+const EventsListPage = lazy(() => import('./pages/admin/EventsListPage'));
+const EventFormPage = lazy(() => import('./pages/admin/EventFormPage'));
+
+// Lazy load public pages
+const EventDetailsPage = lazy(() => import('./pages/events/EventDetailsPage'));
 
 // Lazy load error pages
 const UnauthorizedPage = lazy(() => import('./pages/errors/UnauthorizedPage'));
@@ -42,23 +50,23 @@ const App = () => {
               {/* Public & Protected Routes inside Main Layout */}
               <Route path="/" element={<MainLayout />}>
                 <Route index element={<div className="text-center py-20 text-2xl font-bold font-sans">Welcome to Khaleeji Tour</div>} />
+                <Route path="events/:slug" element={<EventDetailsPage />} />
                 
-                {/* Example of Protected Route
-                <Route path="profile" element={
-                  <ProtectedRoute>
-                    <ProfilePage />
-                  </ProtectedRoute>
-                } /> 
-                */}
-
-                {/* Admin / Dashboard Route */}
+                {/* Admin Routes */}
                 <Route path="admin" element={
                   <ProtectedRoute>
                     <RoleGuard allowedRoles={['admin', 'editor']}>
-                      <DashboardPage />
+                      <AdminLayout />
                     </RoleGuard>
                   </ProtectedRoute>
-                } />
+                }>
+                  <Route index element={<DashboardPage />} />
+                  <Route path="events" element={<EventsListPage />} />
+                  <Route path="events/create" element={<EventFormPage />} />
+                  <Route path="events/:id/edit" element={<EventFormPage />} />
+                  <Route path="seat-maps" element={<SeatMapsListPage />} />
+                  <Route path="seat-maps/:id" element={<SeatMapEditorPage />} />
+                </Route>
                 
                 {/* Error Pages */}
                 <Route path="unauthorized" element={<UnauthorizedPage />} />

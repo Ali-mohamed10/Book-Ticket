@@ -25,7 +25,7 @@ export const EventDetailsSkeleton = () => {
 
       {/* Center seat map skeleton */}
       <div className="flex flex-col gap-4">
-        <ShimmerBlock className="h-150 w-full rounded-lg" />
+        <ShimmerBlock className="h-95 md:h-150 w-full rounded-lg" />
         <div className="flex gap-4">
           <ShimmerBlock className="h-6 w-20" />
           <ShimmerBlock className="h-6 w-20" />

@@ -380,7 +380,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
 
   return (
     <div
-      className={`relative w-full bg-[#12100B] border border-border rounded-lg overflow-hidden select-none transition-all duration-300 ${isFullscreen ? 'h-full border-none rounded-none' : 'h-150'}`}
+      className={`relative w-full bg-[#12100B] border border-border rounded-lg overflow-hidden select-none transition-all duration-300 ${isFullscreen ? 'h-full border-none rounded-none' : 'h-95 md:h-150'}`}
       ref={containerRef}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}

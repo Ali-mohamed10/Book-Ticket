@@ -391,9 +391,16 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     }, 250);
   }, []);
 
-  // Selection callback to page
+  const handleCanvasClick = useCallback(() => {
+    setHoveredTable(null);
+    setIsTooltipDismissed(true);
+  }, []);
+
   // Selection callback to page
   const handleTableClick = useCallback((table, e) => {
+    if (e) {
+      e.stopPropagation();
+    }
     const finalTable = {
       id: table.db_id || table.id,
       table_code: table.table_code || table.id,
@@ -422,6 +429,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     <div
       className={`relative w-full bg-[#12100B] border border-border rounded-lg overflow-hidden select-none transition-all duration-300 ${isFullscreen ? 'h-full border-none rounded-none' : 'h-95 md:h-150'}`}
       ref={containerRef}
+      onClick={handleCanvasClick}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}

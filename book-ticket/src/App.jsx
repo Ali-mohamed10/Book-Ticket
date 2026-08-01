@@ -1,5 +1,5 @@
-import { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Suspense, lazy, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './lib/queryClient';
 import { AuthProvider } from './contexts/AuthContext';
@@ -41,11 +41,33 @@ const PageLoader = () => (
   </div>
 );
 
+// Scroll to top helper on route change
+const ScrollToTopOnRouteChange = () => {
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (hash) {
+      setTimeout(() => {
+        const element = document.getElementById(hash.replace("#", ""));
+        if (element) {
+          const y = element.getBoundingClientRect().top + window.scrollY - 100;
+          window.scrollTo({ top: y, behavior: "smooth" });
+        }
+      }, 100);
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [pathname, hash]);
+
+  return null;
+};
+
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter basename={import.meta.env.BASE_URL}>
+          <ScrollToTopOnRouteChange />
           <Suspense fallback={<PageLoader />}>
             <Routes>
               {/* Public & Protected Routes inside Main Layout */}

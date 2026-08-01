@@ -122,7 +122,9 @@ export const EventFormPage = () => {
         if (key !== 'categories' && key !== 'seat_maps') {
           // Format dates for local datetime-local input
           if (['start_date', 'end_date'].includes(key) && event[key]) {
-            const dateStr = new Date(event[key]).toISOString().slice(0, 16);
+            const d = new Date(event[key]);
+            const tzOffset = d.getTimezoneOffset() * 60000;
+            const dateStr = new Date(d.getTime() - tzOffset).toISOString().slice(0, 16);
             setValue(key, dateStr);
           } else {
             setValue(key, event[key]);
@@ -227,15 +229,7 @@ export const EventFormPage = () => {
                 dir="rtl"
               />
             </div>
-            
-            <FormInput
-              label={t('admin.events.slug', 'URL Slug') + ' *'}
-              {...register('slug')}
-              error={errors.slug?.message}
-              placeholder="e.g. the-titan-edition"
-              disabled={isEditing}
-              className={isEditing ? 'bg-secondary/50 text-muted-foreground' : ''}
-            />
+            <input type="hidden" {...register('slug')} />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormTextarea

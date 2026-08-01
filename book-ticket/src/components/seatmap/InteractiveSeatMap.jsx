@@ -304,7 +304,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
 
   // Merge hover table or selected table with database status/count
   const hoveredTableMerged = useMemo(() => {
-    const activeTable = hoveredTable || (!isTooltipDismissed && selectedTables.length > 0 ? selectedTables[0] : null);
+    const activeTable = hoveredTable || (!isTooltipDismissed && selectedTables.length > 0 ? selectedTables[selectedTables.length - 1] : null);
     if (!activeTable) return null;
 
     const tableId = activeTable.table_code || activeTable.id;
@@ -592,7 +592,10 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
         onTableSelect={handleTableClick}
         onMouseEnter={handleTooltipMouseEnter}
         onMouseLeave={handleTooltipMouseLeave}
-        onClose={() => setIsTooltipDismissed(true)}
+        onClose={() => {
+          setHoveredTable(null);
+          setIsTooltipDismissed(true);
+        }}
       />
     </div>
   );

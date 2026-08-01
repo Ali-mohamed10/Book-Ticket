@@ -40,22 +40,22 @@ export const EventDetailsPage = () => {
     }
   }, [selectedTables.length]);
 
-  // Toggle table selection (memoized, enforces single table selection)
+  // Toggle table selection (Multi-Select)
   const handleTableSelect = useCallback((table) => {
-    // Only block sold tables — available and reserved can be selected
-    if (table.status === 'sold') return;
-
     setSelectedTables((prev) => {
       const exists = prev.find((t) => t.id === table.id);
       if (exists) {
-        // Deselect if clicked again
-        return [];
+        // Deselect table
+        return prev.filter((t) => t.id !== table.id);
       }
-      // Select ONLY the new table, defaulting selectedSeatsCount to 1
-      return [{
-        ...table,
-        selectedSeatsCount: 1
-      }];
+      // Multi-select: append newly selected table
+      return [
+        ...prev,
+        {
+          ...table,
+          selectedSeatsCount: 1
+        }
+      ];
     });
   }, []);
 

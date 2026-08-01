@@ -349,14 +349,17 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     if (tooltipTimeoutRef.current) {
       clearTimeout(tooltipTimeoutRef.current);
     }
+    // Skip if this table was explicitly dismissed by Close button
     const tId = table.table_code || table.id;
     if (dismissedTableId && tId.toUpperCase() === dismissedTableId.toUpperCase()) {
       return;
     }
+    // Skip if tooltip was explicitly dismissed (prevents synthetic mouseenter re-open)
+    if (isTooltipDismissed) return;
+
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     
-    // Only lock position on first enter of a new table to prevent jitter
     setTooltipPos({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
@@ -364,16 +367,17 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
       containerHeight: rect.height,
     });
     
-    setIsTooltipDismissed(false);
     setHoveredTable(table);
-  }, [dismissedTableId]);
+  }, [dismissedTableId, isTooltipDismissed]);
 
   const handleTableMouseLeave = useCallback(() => {
-    setDismissedTableId(null);
+    if (!isTooltipDismissed) {
+      setDismissedTableId(null);
+    }
     tooltipTimeoutRef.current = setTimeout(() => {
       setHoveredTable(null);
     }, 250);
-  }, []);
+  }, [isTooltipDismissed]);
 
   const handleTooltipMouseEnter = useCallback(() => {
     if (tooltipTimeoutRef.current) {

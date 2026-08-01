@@ -277,7 +277,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
   const hoveredTableMerged = useMemo(() => {
     if (!hoveredTable) return null;
     const selected = selectedTables.find(
-      (t) => t.id.toUpperCase() === hoveredTable.id.toUpperCase()
+      (t) => (t.id === hoveredTable.db_id) || (t.table_code?.toUpperCase() === hoveredTable.id.toUpperCase())
     );
     const dbTables = seatMap?.tables || [];
     const dbTable = dbTables.find(
@@ -289,6 +289,8 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
 
     return {
       ...hoveredTable,
+      db_id: dbTable?.id,
+      table_code: hoveredTable.id,
       selectedSeatsCount: selected ? (selected.selectedSeatsCount || 1) : 0,
       isSelected: !!selected,
       availableSeats: maxAvailable,

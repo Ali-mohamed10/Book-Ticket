@@ -32,6 +32,7 @@ export const SeatMapTooltip = ({
 }) => {
   const { t } = useTranslation();
   const [isMobile, setIsMobile] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -41,6 +42,11 @@ export const SeatMapTooltip = ({
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Reset collapse when table changes
+  useEffect(() => {
+    setIsCollapsed(false);
+  }, [table?.id, table?.table_code]);
 
   if (!visible || !table) return null;
 
@@ -74,7 +80,7 @@ export const SeatMapTooltip = ({
     <div 
       className={`absolute z-50 pointer-events-auto bg-[#1A1610]/98 backdrop-blur-md text-[#F7F1E8] border-primary/20 shadow-2xl transition-all duration-300 ${
         isMobile 
-          ? 'bottom-0 inset-x-0 w-full rounded-t-2xl border-t border-primary/30 p-4' 
+          ? 'bottom-0 inset-x-0 w-full rounded-t-2xl border-t border-primary/30 p-3 sm:p-4' 
           : 'rounded-lg border border-primary/20 p-3 min-w-48'
       }`}
       style={isMobile ? {
@@ -93,8 +99,8 @@ export const SeatMapTooltip = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      {/* Header: Table code + Status badge + Close button */}
-      <div className="flex justify-between items-center mb-2 border-b border-primary/10 pb-2">
+      {/* Header: Table code + Status badge + Collapse/Expand Toggle */}
+      <div className={`flex justify-between items-center ${isCollapsed ? '' : 'mb-2 border-b border-primary/10 pb-2'}`}>
         <div className="flex items-center gap-2">
           <span className="font-bold text-base text-[#F7F1E8]">{table.table_code || table.id}</span>
           <span
@@ -103,26 +109,30 @@ export const SeatMapTooltip = ({
           >
             {t(`seatMap.${table.status}`, table.status)}
           </span>
+          {isCollapsed && (
+            <span className="text-xs font-bold text-primary ml-2">
+              ${table.price}
+            </span>
+          )}
         </div>
         
+        {/* Collapse / Expand Button */}
         <button 
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            onClose?.();
+            setIsCollapsed((prev) => !prev);
           }}
-          onPointerDown={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
-          onTouchEnd={(e) => {
-            e.stopPropagation();
-            onClose?.();
-          }}
-          className="text-muted-foreground hover:text-[#F7F1E8] p-1 text-sm font-bold w-6 h-6 flex items-center justify-center rounded-full hover:bg-secondary/20 transition-colors cursor-pointer"
-          aria-label="Close"
+          className="flex items-center justify-center gap-1 text-[11px] font-bold px-2 py-1 rounded bg-secondary/40 hover:bg-secondary/70 text-foreground transition-colors cursor-pointer"
+          aria-label={isCollapsed ? "Expand details" : "Collapse details"}
         >
-          ✕
+          {isCollapsed ? '▲ Expand' : '▼ Collapse'}
         </button>
       </div>
+
+      {/* Main Content (Hidden when collapsed) */}
+      {!isCollapsed && (
+        <>
       
       {/* Metadata layout: 2-column grid on mobile to save vertical space */}
       <div className="grid grid-cols-2 md:block gap-x-6 gap-y-1 mb-2">
@@ -243,6 +253,8 @@ export const SeatMapTooltip = ({
             </button>
           )}
         </div>
+      )}
+        </>
       )}
     </div>
   );

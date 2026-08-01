@@ -88,11 +88,21 @@ export const SeatMapTooltip = ({
         </span>
       </div>
 
-      {/* Available */}
+      {/* Selected (dynamic from current user session) */}
+      {selectedSeatsCount > 0 && (
+        <div className="flex justify-between text-sm mb-1">
+          <span className="text-[#BDAF9D]">{t('seatMap.selected', 'Selected')}</span>
+          <span className="font-medium text-primary">
+            {selectedSeatsCount}
+          </span>
+        </div>
+      )}
+
+      {/* Available (dynamic remaining) */}
       <div className="flex justify-between text-sm mb-1">
         <span className="text-[#BDAF9D]">{t('seatMap.availableLabel', 'Available')}</span>
-        <span className={`font-medium ${availableSeats === 0 ? 'text-[#6b7280]' : 'text-[#22c55e]'}`}>
-          {availableSeats}
+        <span className={`font-medium ${availableSeats - selectedSeatsCount === 0 ? 'text-[#6b7280]' : 'text-[#22c55e]'}`}>
+          {Math.max(0, availableSeats - selectedSeatsCount)}
         </span>
       </div>
       

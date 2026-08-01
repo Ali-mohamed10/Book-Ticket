@@ -39,6 +39,7 @@ export const SeatMapTooltip = ({
 
   const category = TABLE_CATEGORIES[table.category];
   const bookedSeats = table.bookedSeats || 0;
+  const selectedSeatsCount = table.selectedSeatsCount || 0;
   const availableSeats = table.availableSeats ?? (table.capacity - bookedSeats);
   const isSelected = table.isSelected;
   const isSold = table.status === 'sold';

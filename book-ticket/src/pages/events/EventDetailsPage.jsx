@@ -110,7 +110,7 @@ export const EventDetailsPage = () => {
   if (!event) return null;
 
   return (
-    <div className="animate-fade-in-up">
+    <div className={`animate-fade-in-up ${selectedTables.length > 0 && !isCheckingOut ? 'pb-28 md:pb-0' : ''}`}>
       {/* Desktop: Two-column layout (Left: Event Info, Right: Seat Map + Booking/Checkout subgrid) */}
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
         {/* Left — Event Info */}
@@ -169,7 +169,7 @@ export const EventDetailsPage = () => {
       {selectedTables.length > 0 && !isCheckingOut && (
         <div className="fixed bottom-0 inset-x-0 md:hidden bg-card border-t border-border p-4 shadow-premium-top z-40">
           <div className="flex items-center justify-between container mx-auto">
-            <div>
+            <div className="shrink-0 mr-4">
               <span className="text-xs text-muted-foreground block">
                 {t('seatMap.total', 'Total')}
               </span>
@@ -179,7 +179,7 @@ export const EventDetailsPage = () => {
             </div>
             <button 
               onClick={() => setIsCheckingOut(true)}
-              className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity"
+              className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity shrink-0"
             >
               {t('seatMap.proceedToCheckout', 'Proceed to Checkout')} →
             </button>

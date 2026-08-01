@@ -1,7 +1,7 @@
 import imageCompression from 'browser-image-compression';
 import { supabase } from '../lib/supabaseClient';
 
-const BUCKET_NAME = 'event-images';
+const DEFAULT_BUCKET = 'event-images';
 const MAX_FILE_SIZE_BYTES = 15 * 1024 * 1024; // 15 MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
@@ -25,6 +25,7 @@ export interface UploadOptions {
   maxWidth?: number;
   quality?: number;
   generateThumb?: boolean;
+  bucketName?: string;
   onProgress?: (info: UploadProgress) => void;
 }
 
@@ -46,7 +47,7 @@ export const validateImage = (file: File): void => {
 };
 
 /**
- * Compress and convert image to WebP using browser-image-compression
+ * Compress and convert image to WebP using browser-image-compression with fallback
  */
 export const compressImage = async (
   file: File,
@@ -55,7 +56,7 @@ export const compressImage = async (
   onProgress?: (progress: number) => void
 ): Promise<File> => {
   const options = {
-    maxSizeMB: 10,
+    maxSizeMB: 5,
     maxWidthOrHeight: maxWidth,
     useWebWorker: true,
     fileType: 'image/webp',
@@ -67,12 +68,12 @@ export const compressImage = async (
 
   try {
     const compressedBlob = await imageCompression(file, options);
-    // Return a File object with .webp extension
     const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
     return new File([compressedBlob], `${baseName}.webp`, { type: 'image/webp' });
   } catch (error) {
-    console.error('Image compression error:', error);
-    throw new Error('Failed to compress and optimize image.');
+    console.warn('Image compression fallback triggered:', error);
+    // If browser compression fails for any reason, safely return the original file
+    return file;
   }
 };
 
@@ -92,13 +93,22 @@ export const uploadImage = async (
 ): Promise<UploadResult> => {
   const {
     folder,
-    subfolder = Date.now().toString(),
+    subfolder,
     filenamePrefix = 'image',
     maxWidth = 1600,
     quality = 0.8,
     generateThumb = false,
+    bucketName,
     onProgress,
   } = options;
+
+  // Sanitize subfolder to prevent [object Object] in key names
+  const rawSubfolder = typeof subfolder === 'string' ? subfolder : '';
+  const isCleanString = rawSubfolder.trim() !== '' && !rawSubfolder.includes('[object');
+  const safeSubfolder = isCleanString ? rawSubfolder.replace(/[^a-zA-Z0-9_-]/g, '_') : `temp_${Date.now()}`;
+
+  // Determine correct bucket name
+  const targetBucket = bucketName || (folder === 'seatmaps' ? 'seat-maps' : DEFAULT_BUCKET);
 
   // 1. Validate
   if (onProgress) onProgress({ stage: 'validating', progress: 10 });
@@ -120,47 +130,61 @@ export const uploadImage = async (
   // 3. Generate Thumbnail if requested
   let thumbFile: File | null = null;
   if (generateThumb) {
-    thumbFile = await generateThumbnail(file);
+    try {
+      thumbFile = await generateThumbnail(file);
+    } catch (e) {
+      console.warn('Thumbnail generation skipped:', e);
+    }
   }
 
   // 4. Upload to Supabase Storage
   if (onProgress) onProgress({ stage: 'uploading', progress: 80 });
 
   const timestamp = Date.now();
-  const mainPath = `${folder}/${subfolder}/${filenamePrefix}_${timestamp}.webp`;
+  const fileExt = compressedFile.name.endsWith('.webp') ? 'webp' : file.name.split('.').pop() || 'jpg';
+  const mainPath = `${folder}/${safeSubfolder}/${filenamePrefix}_${timestamp}.${fileExt}`;
 
-  const { error: mainUploadError } = await supabase.storage
-    .from(BUCKET_NAME)
-    .upload(mainPath, compressedFile, {
-      contentType: 'image/webp',
-      cacheControl: '360000',
-      upsert: true,
-    });
+  // Helper to attempt upload with fallback bucket if primary bucket fails
+  const performUpload = async (bucket: string, path: string, uploadFile: File) => {
+    const { error: uploadError } = await supabase.storage
+      .from(bucket)
+      .upload(path, uploadFile, {
+        contentType: uploadFile.type || 'image/jpeg',
+      });
+    return uploadError;
+  };
 
-  if (mainUploadError) {
-    console.error('Storage upload error:', mainUploadError);
-    throw mainUploadError;
+  let uploadError = await performUpload(targetBucket, mainPath, compressedFile);
+
+  // Fallback to DEFAULT_BUCKET if targetBucket returned error (e.g. bucket doesn't exist)
+  let activeBucket = targetBucket;
+  if (uploadError && targetBucket !== DEFAULT_BUCKET) {
+    console.warn(`Upload to ${targetBucket} failed. Retrying on ${DEFAULT_BUCKET}:`, uploadError);
+    uploadError = await performUpload(DEFAULT_BUCKET, mainPath, compressedFile);
+    if (!uploadError) {
+      activeBucket = DEFAULT_BUCKET;
+    }
+  }
+
+  if (uploadError) {
+    console.error('Final Supabase Storage upload error:', uploadError);
+    throw new Error(uploadError.message || 'Storage upload failed');
   }
 
   const { data: mainUrlData } = supabase.storage
-    .from(BUCKET_NAME)
+    .from(activeBucket)
     .getPublicUrl(mainPath);
 
   let thumbnailUrl: string | undefined;
 
   if (thumbFile) {
-    const thumbPath = `${folder}/${subfolder}/${filenamePrefix}-thumb_${timestamp}.webp`;
-    const { error: thumbUploadError } = await supabase.storage
-      .from(BUCKET_NAME)
-      .upload(thumbPath, thumbFile, {
-        contentType: 'image/webp',
-        cacheControl: '360000',
-        upsert: true,
-      });
+    const thumbExt = thumbFile.name.endsWith('.webp') ? 'webp' : 'jpg';
+    const thumbPath = `${folder}/${safeSubfolder}/${filenamePrefix}-thumb_${timestamp}.${thumbExt}`;
+    const thumbError = await performUpload(activeBucket, thumbPath, thumbFile);
 
-    if (!thumbUploadError) {
+    if (!thumbError) {
       const { data: thumbUrlData } = supabase.storage
-        .from(BUCKET_NAME)
+        .from(activeBucket)
         .getPublicUrl(thumbPath);
       thumbnailUrl = thumbUrlData.publicUrl;
     }
@@ -182,17 +206,19 @@ export const uploadImage = async (
  */
 export const uploadEventCover = async (
   file: File,
-  eventId?: string,
-  onProgress?: (info: UploadProgress) => void
+  eventId?: any,
+  onProgress?: any
 ): Promise<UploadResult> => {
+  const cleanId = (typeof eventId === 'string' && eventId && !eventId.includes('[object')) ? eventId : `temp_${Date.now()}`;
+  const cleanProgress = typeof onProgress === 'function' ? onProgress : undefined;
   return uploadImage(file, {
     folder: 'events',
-    subfolder: eventId || `temp_${Date.now()}`,
+    subfolder: cleanId,
     filenamePrefix: 'cover',
     maxWidth: 1600,
     quality: 0.8,
     generateThumb: true,
-    onProgress,
+    onProgress: cleanProgress,
   });
 };
 
@@ -201,16 +227,18 @@ export const uploadEventCover = async (
  */
 export const uploadSeatMap = async (
   file: File,
-  eventId?: string,
-  onProgress?: (info: UploadProgress) => void
+  eventId?: any,
+  onProgress?: any
 ): Promise<UploadResult> => {
+  const cleanId = (typeof eventId === 'string' && eventId && !eventId.includes('[object')) ? eventId : `temp_${Date.now()}`;
+  const cleanProgress = typeof onProgress === 'function' ? onProgress : undefined;
   return uploadImage(file, {
     folder: 'seatmaps',
-    subfolder: eventId || `temp_${Date.now()}`,
+    subfolder: cleanId,
     filenamePrefix: 'map',
     maxWidth: 2200,
     quality: 0.9,
     generateThumb: false,
-    onProgress,
+    onProgress: cleanProgress,
   });
 };

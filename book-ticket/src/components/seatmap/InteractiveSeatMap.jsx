@@ -164,7 +164,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
   }, []);
 
   // Pan & Zoom state
-  const [transform, setTransform] = useState({ scale: 0.9, x: 50, y: 20 });
+  const [transform, setTransform] = useState({ scale: 0.95, x: 0, y: 0 });
   const isDragging = useRef(false);
   const startDragPos = useRef({ x: 0, y: 0 });
 
@@ -201,7 +201,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
   }, []);
 
   const handleResetView = useCallback(() => {
-    setTransform({ scale: 0.9, x: 50, y: 20 });
+    setTransform({ scale: 0.95, x: 0, y: 0 });
   }, []);
 
   // Handlers for mouse-wheel zoom (passive: false attached manually via useEffect)
@@ -378,7 +378,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
 
   return (
     <div
-      className={`relative w-full bg-[#12100B] border border-border rounded-lg overflow-hidden select-none transition-all duration-300 ${isFullscreen ? 'h-full border-none rounded-none' : 'h-[600px]'}`}
+      className={`relative w-full bg-[#12100B] border border-border rounded-lg overflow-hidden select-none transition-all duration-300 ${isFullscreen ? 'h-full border-none rounded-none' : 'h-150'}`}
       ref={containerRef}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}

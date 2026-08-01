@@ -335,6 +335,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
       bookedSeats: booked,
       capacity: cap,
       price: dbTable?.price ? parseFloat(dbTable.price) : layoutTable.price,
+      status: computeStatus(booked, cap)
     };
   }, [hoveredTable, selectedTables, seatMap?.tables]);
 

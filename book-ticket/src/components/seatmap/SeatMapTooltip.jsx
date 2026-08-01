@@ -105,7 +105,8 @@ export const SeatMapTooltip = ({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              onMouseLeave(); // Closes / hides tooltip
+              onTableSelect?.(table); // Deselect table if selected
+              onMouseLeave?.();       // Clear hovered state
             }}
             className="text-muted-foreground hover:text-[#F7F1E8] p-1 text-sm font-bold w-6 h-6 flex items-center justify-center rounded-full hover:bg-secondary/20 transition-colors"
           >

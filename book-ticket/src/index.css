@@ -61,6 +61,10 @@
     --destructive: #ef4444;
     --destructive-foreground: #F7F1E8;
 
+    /* Custom Premium Shadows */
+    --shadow-premium-val: 0 10px 30px -10px rgba(27, 18, 15, 0.15), 0 1px 3px rgba(27, 18, 15, 0.05);
+    --shadow-premium-top-val: 0 -10px 30px -10px rgba(27, 18, 15, 0.15);
+
     /* Seat Map Colors — Category colors are PERMANENT (represent table type) */
     --seat-vip: #00a86b;
     --seat-gold: #d4af37;
@@ -86,6 +90,10 @@
     --ring: #C9A96B;
     --destructive: #7f1d1d;
     --destructive-foreground: #F7F1E8;
+
+    /* Custom Premium Shadows for Dark Mode */
+    --shadow-premium-val: 0 10px 30px -10px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.2);
+    --shadow-premium-top-val: 0 -10px 30px -10px rgba(0, 0, 0, 0.6);
 
     /* Seat Map Colors — Category colors are PERMANENT (represent table type) */
     --seat-vip: #00a86b;
@@ -144,6 +152,9 @@
   --color-seat-standard: var(--seat-standard);
   --color-seat-selected: var(--seat-selected);
   --color-seat-reserved-border: var(--seat-reserved-border);
+  
+  --shadow-premium: var(--shadow-premium-val);
+  --shadow-premium-top: var(--shadow-premium-top-val);
   
   --animate-infinite-scroll: infinite-scroll 40s linear infinite;
   --animate-fade-in-up: fade-in-up 0.4s ease-out forwards;

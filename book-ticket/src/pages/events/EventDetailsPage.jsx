@@ -147,7 +147,7 @@ export const EventDetailsPage = () => {
 
       {/* Mobile sticky checkout bar */}
       {selectedTables.length > 0 && (
-        <div className="fixed bottom-0 inset-x-0 lg:hidden bg-card border-t border-border p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] z-40">
+        <div className="fixed bottom-0 inset-x-0 lg:hidden bg-card border-t border-border p-4 shadow-premium-top z-40">
           <div className="flex items-center justify-between container mx-auto">
             <div>
               <span className="text-xs text-muted-foreground block">

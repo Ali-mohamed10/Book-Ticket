@@ -34,7 +34,7 @@ export const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 transition-colors duration-300">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur shadow-premium transition-all duration-300">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Logo onClick={closeMobileMenu} />
@@ -115,7 +115,7 @@ export const Navbar = () => {
 
       {/* Mobile Navigation Drawer */}
       <div
-        className={`md:hidden absolute top-16 left-0 w-full bg-background border-b border-border transition-all duration-300 ease-in-out overflow-hidden shadow-lg ${
+        className={`md:hidden absolute top-16 left-0 w-full bg-background border-b border-border transition-all duration-300 ease-in-out overflow-hidden shadow-premium ${
           isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
         }`}
       >

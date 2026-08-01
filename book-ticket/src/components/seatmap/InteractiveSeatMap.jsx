@@ -250,7 +250,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     };
   }, []);
 
-  // Handlers for panning
+  // Handlers for panning (Mouse)
   const handleMouseDown = (e) => {
     isDragging.current = true;
     startDragPos.current = {
@@ -270,6 +270,34 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
   };
 
   const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
+  // Handlers for panning (Touch/Mobile)
+  const handleTouchStart = (e) => {
+    if (e.touches.length !== 1) return;
+    isDragging.current = true;
+    const touch = e.touches[0];
+    startDragPos.current = {
+      x: touch.clientX - transform.x,
+      y: touch.clientY - transform.y,
+    };
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging.current || e.touches.length !== 1) return;
+    if (e.cancelable) {
+      e.preventDefault();
+    }
+    const touch = e.touches[0];
+    setTransform((prev) => ({
+      ...prev,
+      x: touch.clientX - startDragPos.current.x,
+      y: touch.clientY - startDragPos.current.y,
+    }));
+  };
+
+  const handleTouchEnd = () => {
     isDragging.current = false;
   };
 
@@ -356,6 +384,10 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      style={{ touchAction: 'none' }}
     >
       {/* Zoom, Reset and Fullscreen Controls */}
       <ZoomControls

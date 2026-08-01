@@ -7,7 +7,7 @@
  * Output: Full event page with interactive seat map and booking flow
  * Dependencies: useEventBySlug, InteractiveSeatMap, BookingSummaryCard, CheckoutCard
  */
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useEventBySlug } from '../../hooks/useEvents';
@@ -31,6 +31,14 @@ export const EventDetailsPage = () => {
 
   // Selected tables state
   const [selectedTables, setSelectedTables] = useState([]);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+  // Auto-reset checkout mode when no tables selected
+  useEffect(() => {
+    if (selectedTables.length === 0) {
+      setIsCheckingOut(false);
+    }
+  }, [selectedTables.length]);
 
   // Toggle table selection (memoized, enforces single table selection)
   const handleTableSelect = useCallback((table) => {
@@ -106,7 +114,7 @@ export const EventDetailsPage = () => {
       {/* Desktop: Two-column layout (Left: Event Info, Right: Seat Map + Booking/Checkout subgrid) */}
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
         {/* Left — Event Info */}
-        <div>
+        <div className={isCheckingOut ? 'hidden lg:block' : ''}>
           <EventInfoPanel event={event} />
         </div>
 
@@ -114,7 +122,7 @@ export const EventDetailsPage = () => {
         <div className="flex flex-col gap-6">
           {/* Seat Map */}
           {seatMapData ? (
-            <div className="flex flex-col gap-4">
+            <div className={`flex-col gap-4 ${isCheckingOut ? 'hidden lg:flex' : 'flex'}`}>
               <InteractiveSeatMap
                 seatMap={seatMapData}
                 onTableSelect={handleTableSelect}
@@ -124,30 +132,42 @@ export const EventDetailsPage = () => {
               <SeatMapLegend />
             </div>
           ) : (
-            <div className="flex items-center justify-center h-96 bg-secondary/10 rounded-lg border border-border text-muted-foreground">
+            <div className={`flex items-center justify-center h-96 bg-secondary/10 rounded-lg border border-border text-muted-foreground ${isCheckingOut ? 'hidden lg:flex' : 'flex'}`}>
               {t('eventDetails.noSeatMap', 'No seat map available for this event.')}
             </div>
           )}
 
           {/* Booking Summary & Checkout Cards side-by-side */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <BookingSummaryCard
-              selectedTables={selectedTables}
-              currency={event.currency || 'CAD'}
-              onSeatsCountChange={handleSeatsCountChange}
-            />
-            <CheckoutCard
-              grandTotal={grandTotal}
-              currency={event.currency || 'CAD'}
-              disabled={selectedTables.length === 0}
-            />
+            <div className={isCheckingOut ? 'hidden md:block' : ''}>
+              <BookingSummaryCard
+                selectedTables={selectedTables}
+                currency={event.currency || 'CAD'}
+                onSeatsCountChange={handleSeatsCountChange}
+              />
+            </div>
+            <div className={!isCheckingOut ? 'hidden md:block' : ''}>
+              {isCheckingOut && (
+                <button
+                  onClick={() => setIsCheckingOut(false)}
+                  className="md:hidden mb-4 flex items-center gap-2 text-primary font-semibold text-sm hover:underline"
+                >
+                  ← {t('eventDetails.backToSeats', 'Back to Seat Selection')}
+                </button>
+              )}
+              <CheckoutCard
+                grandTotal={grandTotal}
+                currency={event.currency || 'CAD'}
+                disabled={selectedTables.length === 0}
+              />
+            </div>
           </div>
         </div>
       </div>
 
       {/* Mobile sticky checkout bar */}
-      {selectedTables.length > 0 && (
-        <div className="fixed bottom-0 inset-x-0 lg:hidden bg-card border-t border-border p-4 shadow-premium-top z-40">
+      {selectedTables.length > 0 && !isCheckingOut && (
+        <div className="fixed bottom-0 inset-x-0 md:hidden bg-card border-t border-border p-4 shadow-premium-top z-40">
           <div className="flex items-center justify-between container mx-auto">
             <div>
               <span className="text-xs text-muted-foreground block">
@@ -157,7 +177,10 @@ export const EventDetailsPage = () => {
                 ${grandTotal.toFixed(2)} {event.currency || 'CAD'}
               </span>
             </div>
-            <button className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity">
+            <button 
+              onClick={() => setIsCheckingOut(true)}
+              className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity"
+            >
               {t('seatMap.proceedToCheckout', 'Proceed to Checkout')} →
             </button>
           </div>

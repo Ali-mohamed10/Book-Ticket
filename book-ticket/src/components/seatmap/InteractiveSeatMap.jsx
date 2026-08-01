@@ -438,7 +438,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
 
       {/* SVG Canvas */}
       <div
-        className="w-full h-full origin-center cursor-grab active:cursor-grabbing"
+        className="w-full h-full origin-center cursor-grab active:cursor-grabbing z-0"
         style={{
           transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`,
           transition: isDragging.current ? 'none' : 'transform 0.15s ease-out',
@@ -591,25 +591,27 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
         </div>
       )}
 
-      {/* Hover Tooltip Overlay */}
-      <SeatMapTooltip
-        table={hoveredTableMerged}
-        x={tooltipPos.x}
-        y={tooltipPos.y}
-        containerWidth={tooltipPos.containerWidth}
-        visible={!!hoveredTableMerged}
-        onSeatsCountChange={onSeatsCountChange}
-        onTableSelect={handleTableClick}
-        onMouseEnter={handleTooltipMouseEnter}
-        onMouseLeave={handleTooltipMouseLeave}
-        onClose={() => {
-          if (hoveredTableMerged) {
-            setDismissedTableId(hoveredTableMerged.table_code || hoveredTableMerged.id);
-          }
-          setHoveredTable(null);
-          setIsTooltipDismissed(true);
-        }}
-      />
+      {/* Hover Tooltip Overlay — z-[60] ensures it is above ALL other layers */}
+      <div className="absolute inset-0 z-60 pointer-events-none">
+        <SeatMapTooltip
+          table={hoveredTableMerged}
+          x={tooltipPos.x}
+          y={tooltipPos.y}
+          containerWidth={tooltipPos.containerWidth}
+          visible={!!hoveredTableMerged}
+          onSeatsCountChange={onSeatsCountChange}
+          onTableSelect={handleTableClick}
+          onMouseEnter={handleTooltipMouseEnter}
+          onMouseLeave={handleTooltipMouseLeave}
+          onClose={() => {
+            if (hoveredTableMerged) {
+              setDismissedTableId(hoveredTableMerged.table_code || hoveredTableMerged.id);
+            }
+            setHoveredTable(null);
+            setIsTooltipDismissed(true);
+          }}
+        />
+      </div>
     </div>
   );
 };

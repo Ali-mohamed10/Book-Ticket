@@ -119,6 +119,7 @@ export const EventDetailsPage = () => {
                 seatMap={seatMapData}
                 onTableSelect={handleTableSelect}
                 selectedTables={selectedTables}
+                onSeatsCountChange={handleSeatsCountChange}
               />
               <SeatMapLegend />
             </div>

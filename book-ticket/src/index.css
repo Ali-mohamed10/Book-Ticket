@@ -61,9 +61,9 @@
     --destructive: #ef4444;
     --destructive-foreground: #F7F1E8;
 
-    /* Custom Premium Shadows */
-    --shadow-premium-val: 0 20px 40px -15px rgba(27, 18, 15, 0.22), 0 4px 10px -5px rgba(27, 18, 15, 0.08);
-    --shadow-premium-top-val: 0 -20px 40px -15px rgba(27, 18, 15, 0.22);
+    /* Custom Premium Shadows (Golden Glow) */
+    --shadow-premium-val: 0 20px 40px -15px rgba(201, 169, 107, 0.22), 0 4px 10px -5px rgba(201, 169, 107, 0.1);
+    --shadow-premium-top-val: 0 -20px 40px -15px rgba(201, 169, 107, 0.22);
 
     /* Seat Map Colors — Category colors are PERMANENT (represent table type) */
     --seat-vip: #00a86b;

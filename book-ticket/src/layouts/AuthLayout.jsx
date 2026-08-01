@@ -1,8 +1,6 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ThemeSwitcher } from '../components/ui/ThemeSwitcher';
-import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
-import { Logo } from '../components/ui/Logo';
+import { Navbar } from '../components/layout/Navbar';
 
 export const AuthLayout = () => {
   const { t } = useTranslation();
@@ -10,14 +8,7 @@ export const AuthLayout = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col transition-colors duration-300">
-      {/* Minimal Header */}
-      <header className="w-full p-4 flex items-center justify-between">
-        <Logo />
-        <div className="flex items-center gap-2">
-          <LanguageSwitcher />
-          <ThemeSwitcher />
-        </div>
-      </header>
+      <Navbar />
 
       {/* Main Content Centered */}
       <main className="flex-1 flex items-center justify-center p-4">

@@ -25,7 +25,7 @@ export const HomePage = () => {
       {/* Centered Upcoming Events Header */}
       <div className="flex items-center justify-center gap-4 py-4 select-none">
         <div className="h-px w-12 md:w-20 bg-primary/40" />
-        <h2 className="text-xl md:text-2xl lg:text-3xl font-serif text-[#F7F1E8] tracking-widest font-extrabold uppercase text-center flex items-center gap-2">
+        <h2 className="text-xl md:text-2xl lg:text-3xl font-serif text-primary tracking-widest font-extrabold uppercase text-center flex items-center gap-2">
           {t('home.upcomingEvents', 'Upcoming Events')}
         </h2>
         <div className="h-px w-12 md:w-20 bg-primary/40" />

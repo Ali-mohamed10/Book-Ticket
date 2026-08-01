@@ -86,10 +86,14 @@ export const SeatMapTooltip = ({
         transform: `translate(${translateX}, ${translateY})`,
         opacity: visible ? 1 : 0
       }}
+      onMouseDown={(e) => e.stopPropagation()}
+      onTouchStart={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
+      onTouchEnd={(e) => e.stopPropagation()}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      {/* Header: Table code + Status badge */}
+      {/* Header: Table code + Status badge + Close button */}
       <div className="flex justify-between items-center mb-2 border-b border-primary/10 pb-2">
         <div className="flex items-center gap-2">
           <span className="font-bold text-base text-[#F7F1E8]">{table.table_code || table.id}</span>
@@ -101,18 +105,23 @@ export const SeatMapTooltip = ({
           </span>
         </div>
         
-        {isMobile && (
-          <button 
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose?.(); // visually close tooltip without deselecting
-            }}
-            className="text-muted-foreground hover:text-[#F7F1E8] p-1 text-sm font-bold w-6 h-6 flex items-center justify-center rounded-full hover:bg-secondary/20 transition-colors"
-          >
-            ✕
-          </button>
-        )}
+        <button 
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose?.();
+          }}
+          onPointerDown={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchEnd={(e) => {
+            e.stopPropagation();
+            onClose?.();
+          }}
+          className="text-muted-foreground hover:text-[#F7F1E8] p-1 text-sm font-bold w-6 h-6 flex items-center justify-center rounded-full hover:bg-secondary/20 transition-colors cursor-pointer"
+          aria-label="Close"
+        >
+          ✕
+        </button>
       </div>
       
       {/* Metadata layout: 2-column grid on mobile to save vertical space */}

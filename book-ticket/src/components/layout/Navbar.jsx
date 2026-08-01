@@ -16,7 +16,7 @@ export const Navbar = () => {
   const fullName = profile?.full_name || user?.user_metadata?.full_name || 'User';
   const displayLetter = fullName.charAt(0).toUpperCase();
   const displayName = fullName !== 'User' 
-    ? fullName.trim().split(/\s+/).slice(0, 2).join(' ') 
+    ? fullName.trim().split(/\s+/)[0] 
     : 'User';
 
   const navLinks = [

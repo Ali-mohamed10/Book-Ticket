@@ -303,15 +303,12 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     isDragging.current = false;
   };
 
-  // Merge hover table or selected table with database status/count
+  // Merge hover table with database status/count
   const hoveredTableMerged = useMemo(() => {
-    const activeTable = hoveredTable || (!isTooltipDismissed && selectedTables.length > 0 ? selectedTables[selectedTables.length - 1] : null);
+    const activeTable = hoveredTable;
     if (!activeTable) return null;
 
     const tableId = activeTable.table_code || activeTable.id;
-    if (dismissedTableId && tableId.toUpperCase() === dismissedTableId.toUpperCase()) {
-      return null;
-    }
     const dbId = activeTable.db_id || activeTable.id;
 
     const layoutTable = TABLE_LAYOUTS.find(

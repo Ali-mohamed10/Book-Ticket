@@ -4,18 +4,18 @@
  * Purpose: Enhanced booking summary for the public Event Details page.
  *          Displays selected tables, number of selected seats,
  *          pricing breakdown, service fee, and grand total.
- * Input: selectedTables (array), currency (string)
+ * Input: selectedTables (array), currency (string), onSeatsCountChange (func), onTableSelect (func)
  * Output: Rendered booking summary card
  * Dependencies: react-i18next, lucide-react
  */
 import { useMemo, memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Users } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 
 // Service fee percentage
 const SERVICE_FEE_RATE = 0.05;
 
-const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD' }) => {
+export const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD', onSeatsCountChange, onTableSelect }) => {
   const { t } = useTranslation();
 
   // Memoize price calculations
@@ -53,10 +53,12 @@ const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD' }) => {
           <div className="space-y-3">
             {selectedTables.map((table) => {
               const currentSeats = table.selectedSeatsCount || 1;
+              const tableId = table.id || table.db_id || table.table_code;
+              const maxAvailable = table.availableSeats ?? table.capacity;
 
               return (
                 <div
-                  key={table.id}
+                  key={tableId}
                   className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-secondary/10 rounded-lg border border-border/50"
                 >
                   {/* Table details */}
@@ -64,7 +66,7 @@ const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD' }) => {
                     {/* Table number badge */}
                     <div className="flex flex-col items-center justify-center w-14 h-14 rounded-lg bg-secondary/20 border border-border shrink-0">
                       <span className="text-xl font-bold font-serif text-foreground leading-none">
-                        {table.table_code}
+                        {table.table_code || table.id}
                       </span>
                     </div>
 
@@ -77,19 +79,39 @@ const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD' }) => {
                           {t(`seatMap.${table.category}`, table.category)}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Users className="w-3.5 h-3.5" />
-                        <span>
-                          {t('checkout.seatsSelected', '{{count}} seats selected', {
-                            count: currentSeats,
-                          })}
+
+                      {/* Seats counter adjustment */}
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex items-center bg-background border border-border rounded-lg p-0.5 shadow-sm">
+                          <button
+                            type="button"
+                            onClick={() => onSeatsCountChange?.(tableId, Math.max(1, currentSeats - 1))}
+                            disabled={currentSeats <= 1}
+                            className="w-6 h-6 flex items-center justify-center rounded hover:bg-secondary/40 text-foreground disabled:opacity-20 transition-colors font-bold text-xs cursor-pointer"
+                          >
+                            -
+                          </button>
+                          <span className="w-6 text-center text-xs font-bold text-foreground">
+                            {currentSeats}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => onSeatsCountChange?.(tableId, Math.min(maxAvailable, currentSeats + 1))}
+                            disabled={currentSeats >= maxAvailable}
+                            className="w-6 h-6 flex items-center justify-center rounded hover:bg-secondary/40 text-foreground disabled:opacity-20 transition-colors font-bold text-xs cursor-pointer"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {t('seatMap.seatsLabel', 'seats')}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Price display wrapper */}
-                  <div className="flex items-center justify-between sm:justify-end gap-6 border-t sm:border-t-0 border-border/50 pt-3 sm:pt-0">
+                  {/* Price display & Remove button */}
+                  <div className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 border-border/50 pt-3 sm:pt-0">
                     <div className="text-right">
                       <span className="font-bold text-foreground block">
                         ${(Number(table.price) * currentSeats).toFixed(2)}
@@ -98,6 +120,16 @@ const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD' }) => {
                         ${Number(table.price).toFixed(2)} x {currentSeats}
                       </span>
                     </div>
+
+                    {/* Deselect / Remove button */}
+                    <button
+                      type="button"
+                      onClick={() => onTableSelect?.(table)}
+                      className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors cursor-pointer"
+                      title={t('seatMap.deselectTable', 'Remove Table')}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               );
@@ -114,12 +146,10 @@ const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD' }) => {
             <span className="text-muted-foreground">
               {t('checkout.totalSeats', 'Total Seats Booked')}
             </span>
-            <span className="text-foreground font-semibold">
-              {pricing.totalSeats} {t('checkout.seats', 'seats')}
-            </span>
+            <span className="text-foreground font-medium">{pricing.totalSeats}</span>
           </div>
 
-          {/* Ticket price */}
+          {/* Ticket total */}
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">
               {t('checkout.ticketPrice', 'Ticket Price')}
@@ -136,13 +166,10 @@ const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD' }) => {
           </div>
 
           {/* Grand total */}
-          <div className="flex justify-between items-end pt-3 border-t border-border">
-            <span className="text-muted-foreground font-medium uppercase tracking-wider text-sm">
-              {t('seatMap.total', 'Total')}
-            </span>
-            <span className="font-bold font-sans text-2xl text-primary">
-              ${pricing.grandTotal.toFixed(2)}
-              <span className="text-xs font-normal text-muted-foreground ms-1">{currency}</span>
+          <div className="flex justify-between text-base font-bold pt-2 border-t border-border/50">
+            <span className="text-foreground">{t('checkout.grandTotal', 'Grand Total')}</span>
+            <span className="text-primary font-serif text-xl">
+              ${pricing.grandTotal.toFixed(2)} {currency}
             </span>
           </div>
         </div>
@@ -152,4 +179,5 @@ const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD' }) => {
 });
 
 BookingSummaryCard.displayName = 'BookingSummaryCard';
-export { BookingSummaryCard };
+
+export default BookingSummaryCard;

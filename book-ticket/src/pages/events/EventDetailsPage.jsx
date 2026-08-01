@@ -144,6 +144,7 @@ export const EventDetailsPage = () => {
                 selectedTables={selectedTables}
                 currency={event.currency || 'CAD'}
                 onSeatsCountChange={handleSeatsCountChange}
+                onTableSelect={handleTableSelect}
               />
             </div>
             <div className={!isCheckingOut ? 'hidden md:block' : ''}>

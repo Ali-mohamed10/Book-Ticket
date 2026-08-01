@@ -4,7 +4,6 @@
  * Purpose: Display table details.
  *          On desktop: absolute floating tooltip near table.
  *          On mobile: docked bottom sheet at the bottom of the container.
- *          Closes and disappears completely when (X) or empty space is clicked.
  */
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,6 +36,7 @@ export const SeatMapTooltip = ({
 }) => {
   const { t } = useTranslation();
   const [isMobile, setIsMobile] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -46,6 +46,11 @@ export const SeatMapTooltip = ({
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Reset collapse when table changes
+  useEffect(() => {
+    setIsCollapsed(false);
+  }, [table?.id, table?.table_code]);
 
   if (!visible || !table) return null;
 
@@ -102,8 +107,10 @@ export const SeatMapTooltip = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      {/* Header: Table code + Status badge + Close button */}
-      <div className="flex justify-between items-center mb-2 border-b border-primary/10 pb-2">
+      {/* Header: Table code + Status badge + Collapse/Expand Toggle */}
+      <div
+        className={`flex justify-between items-center ${isCollapsed ? '' : 'mb-2 border-b border-primary/10 pb-2'}`}
+      >
         <div className="flex items-center gap-2">
           <span className="font-bold text-base text-[#F7F1E8]">{table.table_code || table.id}</span>
           <span
@@ -112,151 +119,159 @@ export const SeatMapTooltip = ({
           >
             {t(`seatMap.${table.status}`, table.status)}
           </span>
+          {isCollapsed && (
+            <span className="text-xs font-bold text-primary ml-2">${table.price}</span>
+          )}
         </div>
 
-        {/* Close Button (Disappears completely on click) */}
+        {/* Collapse / Expand Button */}
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            onClose?.();
+            setIsCollapsed((prev) => !prev);
           }}
-          className="text-muted-foreground hover:text-[#F7F1E8] p-1 text-sm font-bold w-6 h-6 flex items-center justify-center rounded-full hover:bg-secondary/20 transition-colors cursor-pointer"
-          aria-label="Close"
+          className="flex items-center justify-center gap-1 text-[11px] font-bold px-2 py-1 rounded bg-secondary/40 hover:bg-secondary/70 text-foreground transition-colors cursor-pointer"
+          aria-label={isCollapsed ? 'Expand details' : 'Collapse details'}
         >
-          ✕
+          {isCollapsed ? '▲ Expand' : '▼ Collapse'}
         </button>
       </div>
 
-      {/* Metadata layout */}
-      <div className="grid grid-cols-2 md:block gap-x-6 gap-y-1 mb-2">
-        {/* Category */}
-        <div className="flex justify-between text-sm mb-1">
-          <span className="text-[#BDAF9D]">{t('seatMap.categoryLabel', 'Category')}</span>
-          <span className="font-medium" style={{ color: `var(${category?.colorVar})` }}>
-            {t(category?.label)}
-          </span>
-        </div>
+      {/* Main Content (Hidden when collapsed) */}
+      {!isCollapsed && (
+        <>
+          {/* Metadata layout: 2-column grid on mobile to save vertical space */}
+          <div className="grid grid-cols-2 md:block gap-x-6 gap-y-1 mb-2">
+            {/* Category */}
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-[#BDAF9D]">{t('seatMap.categoryLabel', 'Category')}</span>
+              <span className="font-medium" style={{ color: `var(${category?.colorVar})` }}>
+                {t(category?.label)}
+              </span>
+            </div>
 
-        {/* Capacity */}
-        <div className="flex justify-between text-sm mb-1">
-          <span className="text-[#BDAF9D]">{t('seatMap.capacityLabel', 'Capacity')}</span>
-          <span className="font-medium text-[#F7F1E8]">{table.capacity}</span>
-        </div>
+            {/* Capacity */}
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-[#BDAF9D]">{t('seatMap.capacityLabel', 'Capacity')}</span>
+              <span className="font-medium text-[#F7F1E8]">{table.capacity}</span>
+            </div>
 
-        {/* Booked */}
-        <div className="flex justify-between text-sm mb-1">
-          <span className="text-[#BDAF9D]">{t('seatMap.bookedLabel', 'Booked')}</span>
-          <span
-            className={`font-medium ${bookedSeats > 0 ? 'text-[#f59e0b]' : 'text-[#F7F1E8]'}`}
-          >
-            {bookedSeats}
-          </span>
-        </div>
+            {/* Booked */}
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-[#BDAF9D]">{t('seatMap.bookedLabel', 'Booked')}</span>
+              <span
+                className={`font-medium ${bookedSeats > 0 ? 'text-[#f59e0b]' : 'text-[#F7F1E8]'}`}
+              >
+                {bookedSeats}
+              </span>
+            </div>
 
-        {/* Selected (dynamic from current user session) */}
-        {selectedSeatsCount > 0 && (
-          <div className="flex justify-between text-sm mb-1">
-            <span className="text-[#BDAF9D]">{t('seatMap.selected', 'Selected')}</span>
-            <span className="font-medium text-primary">{selectedSeatsCount}</span>
-          </div>
-        )}
-
-        {/* Available */}
-        <div className="flex justify-between text-sm mb-1">
-          <span className="text-[#BDAF9D]">{t('seatMap.availableLabel', 'Available')}</span>
-          <span
-            className={`font-medium ${availableSeats - selectedSeatsCount === 0 ? 'text-[#6b7280]' : 'text-[#22c55e]'}`}
-          >
-            {Math.max(0, availableSeats - selectedSeatsCount)}
-          </span>
-        </div>
-
-        {/* Price per seat */}
-        <div className="flex justify-between text-sm mb-1">
-          <span className="text-[#BDAF9D]">{t('seatMap.priceLabel', 'Price')}</span>
-          <span className="font-bold text-primary">${table.price}</span>
-        </div>
-      </div>
-
-      {/* Select / Seats adjustment block */}
-      {!isSold && (
-        <div className="mt-2 pt-2 border-t border-primary/10">
-          {isSelected ? (
-            <div className="space-y-3">
-              {/* Seats selector row */}
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-[#BDAF9D]">
-                  {t('seatMap.seatsToBook', 'Book Seats')}
-                </span>
-                <div className="flex items-center bg-background border border-border rounded-lg p-0.5 shadow-sm">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSeatsCountChange?.(
-                        table.db_id || table.id,
-                        Math.max(1, table.selectedSeatsCount - 1)
-                      );
-                    }}
-                    disabled={table.selectedSeatsCount <= 1}
-                    className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-secondary/40 text-foreground disabled:opacity-20 disabled:hover:bg-transparent transition-colors font-bold"
-                  >
-                    -
-                  </button>
-                  <span className="w-7 text-center text-xs font-bold text-foreground">
-                    {table.selectedSeatsCount}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSeatsCountChange?.(
-                        table.db_id || table.id,
-                        Math.min(availableSeats, table.selectedSeatsCount + 1)
-                      );
-                    }}
-                    disabled={table.selectedSeatsCount >= availableSeats}
-                    className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-secondary/40 text-foreground disabled:opacity-20 disabled:hover:bg-transparent transition-colors font-bold"
-                  >
-                    +
-                  </button>
-                </div>
+            {/* Selected (dynamic from current user session) */}
+            {selectedSeatsCount > 0 && (
+              <div className="flex justify-between text-sm mb-1">
+                <span className="text-[#BDAF9D]">{t('seatMap.selected', 'Selected')}</span>
+                <span className="font-medium text-primary">{selectedSeatsCount}</span>
               </div>
+            )}
 
-              {/* Total Price & Deselect button */}
-              <div className="flex flex-row md:flex-col gap-3 justify-between items-center md:items-stretch">
-                <div className="flex justify-between items-center text-xs font-bold text-primary gap-2">
-                  <span>{t('seatMap.total', 'Total')}</span>
-                  <span>${(Number(table.price) * table.selectedSeatsCount).toFixed(2)}</span>
+            {/* Available */}
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-[#BDAF9D]">{t('seatMap.availableLabel', 'Available')}</span>
+              <span
+                className={`font-medium ${availableSeats - selectedSeatsCount === 0 ? 'text-[#6b7280]' : 'text-[#22c55e]'}`}
+              >
+                {Math.max(0, availableSeats - selectedSeatsCount)}
+              </span>
+            </div>
+
+            {/* Price per seat */}
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-[#BDAF9D]">{t('seatMap.priceLabel', 'Price')}</span>
+              <span className="font-bold text-primary">${table.price}</span>
+            </div>
+          </div>
+
+          {/* Select / Seats adjustment block */}
+          {!isSold && (
+            <div className="mt-2 pt-2 border-t border-primary/10">
+              {isSelected ? (
+                <div className="space-y-3">
+                  {/* Seats selector row */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-[#BDAF9D]">
+                      {t('seatMap.seatsToBook', 'Book Seats')}
+                    </span>
+                    <div className="flex items-center bg-background border border-border rounded-lg p-0.5 shadow-sm">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSeatsCountChange?.(
+                            table.db_id || table.id,
+                            Math.max(1, table.selectedSeatsCount - 1)
+                          );
+                        }}
+                        disabled={table.selectedSeatsCount <= 1}
+                        className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-secondary/40 text-foreground disabled:opacity-20 disabled:hover:bg-transparent transition-colors font-bold"
+                      >
+                        -
+                      </button>
+                      <span className="w-7 text-center text-xs font-bold text-foreground">
+                        {table.selectedSeatsCount}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSeatsCountChange?.(
+                            table.db_id || table.id,
+                            Math.min(availableSeats, table.selectedSeatsCount + 1)
+                          );
+                        }}
+                        disabled={table.selectedSeatsCount >= availableSeats}
+                        className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-secondary/40 text-foreground disabled:opacity-20 disabled:hover:bg-transparent transition-colors font-bold"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Total Price & Deselect button in a flex row on mobile */}
+                  <div className="flex flex-row md:flex-col gap-3 justify-between items-center md:items-stretch">
+                    <div className="flex justify-between items-center text-xs font-bold text-primary gap-2">
+                      <span>{t('seatMap.total', 'Total')}</span>
+                      <span>${(Number(table.price) * table.selectedSeatsCount).toFixed(2)}</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onTableSelect?.(table);
+                      }}
+                      className="bg-destructive/10 hover:bg-destructive/25 border border-destructive/20 text-destructive text-xs py-1.5 px-3 md:px-0 rounded font-bold transition-colors"
+                    >
+                      {t('seatMap.deselectTable', 'Deselect Table')}
+                    </button>
+                  </div>
                 </div>
-
+              ) : (
+                /* Select table button */
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     onTableSelect?.(table);
                   }}
-                  className="bg-destructive/10 hover:bg-destructive/25 border border-destructive/20 text-destructive text-xs py-1.5 px-3 md:px-0 rounded font-bold transition-colors"
+                  className="w-full bg-primary text-primary-foreground hover:opacity-90 text-xs py-2 rounded font-bold transition-opacity"
                 >
-                  {t('seatMap.deselectTable', 'Deselect Table')}
+                  {t('seatMap.selectTableBtn', 'Select Table')}
                 </button>
-              </div>
+              )}
             </div>
-          ) : (
-            /* Select table button */
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onTableSelect?.(table);
-              }}
-              className="w-full bg-primary text-primary-foreground hover:opacity-90 text-xs py-2 rounded font-bold transition-opacity"
-            >
-              {t('seatMap.selectTableBtn', 'Select Table')}
-            </button>
           )}
-        </div>
+        </>
       )}
     </div>
   );

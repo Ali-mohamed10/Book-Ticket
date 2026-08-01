@@ -89,12 +89,11 @@ export const EventCard = ({ event }) => {
               </span>
             </div>
 
-            <Link
-              to={`/events/${event.slug}`}
+            <div
               className="bg-[#D4AF37] hover:bg-[#B8860B] text-black font-medium py-2 px-6 rounded-xl text-sm uppercase tracking-wider transition-colors duration-300"
             >
               {t('events.bookNow', 'BOOK NOW')}
-            </Link>
+            </div>
           </div>
         </div>
       </div>

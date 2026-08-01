@@ -3,7 +3,7 @@
  *
  * Purpose: Render the custom venue seating map (Nai Restaurant) matching the layout
  *          with Stage, Dance Floor, Wait Areas, Entrance, and all 65 tables.
- *          Supports zoom, pan, tooltip, and table selection.
+ *          Supports zoom, pan, and click-to-view table details popup.
  * Inputs: seatMap object, onTableSelect, selectedTables array
  * Output: Interactive SVG Map with custom rooms and room coordinates
  * Dependencies: react, lucide-react, react-i18next
@@ -113,14 +113,9 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
   const { t } = useTranslation();
   const containerRef = useRef(null);
 
-  // Tooltip hover management refs
-  const tooltipTimeoutRef = useRef(null);
-
-  // Tooltip state
-  const [hoveredTable, setHoveredTable] = useState(null);
+  // Active clicked table popup state (NO hover)
+  const [clickedTable, setClickedTable] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-  const [isTooltipDismissed, setIsTooltipDismissed] = useState(false);
-  const [dismissedTableId, setDismissedTableId] = useState(null);
 
   // Zoom Scroll Overlay prompt state
   const [showScrollOverlay, setShowScrollOverlay] = useState(false);
@@ -128,15 +123,6 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
 
   // Fullscreen state
   const [isFullscreen, setIsFullscreen] = useState(false);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (tooltipTimeoutRef.current) {
-        clearTimeout(tooltipTimeoutRef.current);
-      }
-    };
-  }, []);
 
   const toggleFullscreen = useCallback(() => {
     const container = containerRef.current;
@@ -174,7 +160,6 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
   const mergedTables = useMemo(() => {
     const dbTables = seatMap?.tables || [];
     return TABLE_LAYOUTS.map((layout) => {
-      // Find matching table in database by table_code
       const dbTable = dbTables.find(
         (t) => t.table_code.toUpperCase() === layout.id.toUpperCase()
       );
@@ -206,18 +191,16 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     setTransform({ scale: 0.95, x: 0, y: 0 });
   }, []);
 
-  // Handlers for mouse-wheel zoom (passive: false attached manually via useEffect)
+  // Handlers for mouse-wheel zoom
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const handleWheel = (e) => {
-      // If the scroll is mostly horizontal (swiping left/right), ignore it
       if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) {
         return;
       }
 
-      // If we are in fullscreen, we do not require Ctrl/Cmd modifier to zoom
       const isFullscreenActive = !!document.fullscreenElement;
       const isMac = navigator.platform.indexOf('Mac') > -1;
       const modifierPressed = isFullscreenActive || (isMac ? e.metaKey : e.ctrlKey);
@@ -232,7 +215,6 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
         });
         setShowScrollOverlay(false);
       } else {
-        // Show prompt overlay since they scrolled without modifier key (only in non-fullscreen)
         setShowScrollOverlay(true);
         if (overlayTimeoutRef.current) {
           clearTimeout(overlayTimeoutRef.current);
@@ -303,13 +285,12 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     isDragging.current = false;
   };
 
-  // Merge hover table with database status/count
-  const hoveredTableMerged = useMemo(() => {
-    const activeTable = hoveredTable;
-    if (!activeTable) return null;
+  // Merge clicked table with database status/count
+  const clickedTableMerged = useMemo(() => {
+    if (!clickedTable) return null;
 
-    const tableId = activeTable.table_code || activeTable.id;
-    const dbId = activeTable.db_id || activeTable.id;
+    const tableId = clickedTable.table_code || clickedTable.id;
+    const dbId = clickedTable.db_id || clickedTable.id;
 
     const layoutTable = TABLE_LAYOUTS.find(
       (t) => t.id.toUpperCase() === tableId.toUpperCase()
@@ -339,61 +320,13 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
       price: dbTable?.price ? parseFloat(dbTable.price) : layoutTable.price,
       status: computeStatus(booked, cap)
     };
-  }, [hoveredTable, selectedTables, seatMap?.tables]);
-
-  // Hover states for tooltips with timed buffers to allow moving mouse into tooltip
-  const handleTableMouseEnter = useCallback((table, e) => {
-    if (tooltipTimeoutRef.current) {
-      clearTimeout(tooltipTimeoutRef.current);
-    }
-    // Skip if this table was explicitly dismissed by Close button
-    const tId = table.table_code || table.id;
-    if (dismissedTableId && tId.toUpperCase() === dismissedTableId.toUpperCase()) {
-      return;
-    }
-    // Skip if tooltip was explicitly dismissed (prevents synthetic mouseenter re-open)
-    if (isTooltipDismissed) return;
-
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    
-    setTooltipPos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-      containerWidth: rect.width,
-      containerHeight: rect.height,
-    });
-    
-    setHoveredTable(table);
-  }, [dismissedTableId, isTooltipDismissed]);
-
-  const handleTableMouseLeave = useCallback(() => {
-    if (!isTooltipDismissed) {
-      setDismissedTableId(null);
-    }
-    tooltipTimeoutRef.current = setTimeout(() => {
-      setHoveredTable(null);
-    }, 250);
-  }, [isTooltipDismissed]);
-
-  const handleTooltipMouseEnter = useCallback(() => {
-    if (tooltipTimeoutRef.current) {
-      clearTimeout(tooltipTimeoutRef.current);
-    }
-  }, []);
-
-  const handleTooltipMouseLeave = useCallback(() => {
-    tooltipTimeoutRef.current = setTimeout(() => {
-      setHoveredTable(null);
-    }, 250);
-  }, []);
+  }, [clickedTable, selectedTables, seatMap?.tables]);
 
   const handleCanvasClick = useCallback(() => {
-    setHoveredTable(null);
-    setIsTooltipDismissed(true);
+    setClickedTable(null);
   }, []);
 
-  // Selection callback to page
+  // Selection & Popup callback
   const handleTableClick = useCallback((table, e) => {
     if (e) {
       e.stopPropagation();
@@ -417,8 +350,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
       });
     }
 
-    setDismissedTableId(null);
-    setIsTooltipDismissed(false);
+    setClickedTable(table);
     onTableSelect(finalTable);
   }, [onTableSelect]);
 
@@ -573,11 +505,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
               (t) => (t.id === table.db_id) || (t.table_code === table.id)
             );
             return (
-              <g
-                key={table.id}
-                onMouseEnter={(e) => handleTableMouseEnter(table, e)}
-                onMouseLeave={handleTableMouseLeave}
-              >
+              <g key={table.id}>
                 <Table
                   table={table}
                   isSelected={isSelected}
@@ -600,25 +528,17 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
         </div>
       )}
 
-      {/* Hover Tooltip Overlay — z-[60] ensures it is above ALL other layers */}
+      {/* Click Popup Overlay — z-60 ensures it is above ALL other layers */}
       <div className="absolute inset-0 z-60 pointer-events-none">
         <SeatMapTooltip
-          table={hoveredTableMerged}
+          table={clickedTableMerged}
           x={tooltipPos.x}
           y={tooltipPos.y}
           containerWidth={tooltipPos.containerWidth}
-          visible={!!hoveredTableMerged}
+          visible={!!clickedTableMerged}
           onSeatsCountChange={onSeatsCountChange}
           onTableSelect={handleTableClick}
-          onMouseEnter={handleTooltipMouseEnter}
-          onMouseLeave={handleTooltipMouseLeave}
-          onClose={() => {
-            if (hoveredTableMerged) {
-              setDismissedTableId(hoveredTableMerged.table_code || hoveredTableMerged.id);
-            }
-            setHoveredTable(null);
-            setIsTooltipDismissed(true);
-          }}
+          onClose={() => setClickedTable(null)}
         />
       </div>
     </div>

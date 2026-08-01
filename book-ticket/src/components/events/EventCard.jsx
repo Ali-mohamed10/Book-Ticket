@@ -84,7 +84,7 @@ export const EventCard = ({ event }) => {
               <span className="text-xs text-muted-foreground uppercase tracking-widest">
                 {t('events.from', 'FROM')}
               </span>
-              <span className="text-2xl text-primary font-semibold">
+              <span className="text-2xl font-serif font-bold text-primary">
                 ${event.starting_price}
               </span>
             </div>

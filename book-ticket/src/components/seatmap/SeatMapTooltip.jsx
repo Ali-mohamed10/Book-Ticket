@@ -27,6 +27,7 @@ export const SeatMapTooltip = ({
   table,
   x,
   y,
+  containerWidth = 600,
   visible,
   onSeatsCountChange,
   onTableSelect,
@@ -44,17 +45,33 @@ export const SeatMapTooltip = ({
   const isSelected = table.isSelected;
   const isSold = table.status === 'sold';
 
+  // 1. Vertical Positioning (Top / Bottom)
   const isUpperHalf = y < 350;
   const clampedTop = isUpperHalf ? Math.min(y, 220) : Math.max(y, 370);
   const translateY = isUpperHalf ? '15px' : '-105%';
+
+  // 2. Horizontal Positioning (Left / Center / Right)
+  const tooltipWidth = 240;
+  const halfWidth = tooltipWidth / 2;
+  
+  let translateX = '-50%';
+  let clampedLeft = x;
+
+  if (x < halfWidth + 15) {
+    translateX = '0%';
+    clampedLeft = Math.max(10, x - 10);
+  } else if (containerWidth && x > containerWidth - (halfWidth + 15)) {
+    translateX = '-100%';
+    clampedLeft = Math.min(containerWidth - 10, x + 10);
+  }
 
   return (
     <div 
       className="absolute z-50 pointer-events-auto bg-[#1A1610]/95 backdrop-blur-md text-[#F7F1E8] border border-primary/20 shadow-xl rounded-lg p-3 min-w-48 transition-all duration-200"
       style={{
-        left: `${x}px`,
+        left: `${clampedLeft}px`,
         top: `${clampedTop}px`,
-        transform: `translate(-50%, ${translateY})`,
+        transform: `translate(${translateX}, ${translateY})`,
         opacity: visible ? 1 : 0
       }}
       onMouseEnter={onMouseEnter}

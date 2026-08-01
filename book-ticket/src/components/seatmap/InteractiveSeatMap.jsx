@@ -340,6 +340,8 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     setTooltipPos({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
+      containerWidth: rect.width,
+      containerHeight: rect.height,
     });
     
     setHoveredTable(table);
@@ -558,6 +560,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
         table={hoveredTableMerged}
         x={tooltipPos.x}
         y={tooltipPos.y}
+        containerWidth={tooltipPos.containerWidth}
         visible={!!hoveredTable}
         onSeatsCountChange={onSeatsCountChange}
         onTableSelect={handleTableClick}

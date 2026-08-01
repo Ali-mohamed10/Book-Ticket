@@ -21,7 +21,10 @@ const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD' }) => {
   // Memoize price calculations
   const pricing = useMemo(() => {
     const totalSeats = selectedTables.reduce((sum, tbl) => sum + (tbl.selectedSeatsCount || 1), 0);
-    const ticketTotal = selectedTables.reduce((sum, tbl) => sum + parseFloat(tbl.price || 0) * (tbl.selectedSeatsCount || 1), 0);
+    const ticketTotal = selectedTables.reduce(
+      (sum, tbl) => sum + parseFloat(tbl.price || 0) * (tbl.selectedSeatsCount || 1),
+      0
+    );
     const serviceFee = ticketTotal * SERVICE_FEE_RATE;
     const grandTotal = ticketTotal + serviceFee;
 
@@ -77,7 +80,9 @@ const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD' }) => {
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Users className="w-3.5 h-3.5" />
                         <span>
-                          {t('checkout.seatsSelected', '{{count}} seats selected', { count: currentSeats })}
+                          {t('checkout.seatsSelected', '{{count}} seats selected', {
+                            count: currentSeats,
+                          })}
                         </span>
                       </div>
                     </div>
@@ -119,9 +124,7 @@ const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD' }) => {
             <span className="text-muted-foreground">
               {t('checkout.ticketPrice', 'Ticket Price')}
             </span>
-            <span className="text-foreground font-medium">
-              ${pricing.ticketTotal.toFixed(2)}
-            </span>
+            <span className="text-foreground font-medium">${pricing.ticketTotal.toFixed(2)}</span>
           </div>
 
           {/* Service fee */}
@@ -129,9 +132,7 @@ const BookingSummaryCard = memo(({ selectedTables = [], currency = 'CAD' }) => {
             <span className="text-muted-foreground">
               {t('checkout.serviceFee', 'Service Fee (5%)')}
             </span>
-            <span className="text-foreground font-medium">
-              ${pricing.serviceFee.toFixed(2)}
-            </span>
+            <span className="text-foreground font-medium">${pricing.serviceFee.toFixed(2)}</span>
           </div>
 
           {/* Grand total */}

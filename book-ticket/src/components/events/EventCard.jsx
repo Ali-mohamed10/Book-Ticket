@@ -20,7 +20,7 @@ export const EventCard = ({ event }) => {
   };
 
   return (
-    <div className="group relative rounded-xl border border-border bg-secondary/20 overflow-hidden hover:border-primary/50 transition-all duration-300 flex flex-col h-full shadow-premium hover:shadow-[0_0_20px_rgba(201,169,107,0.2)]">
+    <div className="group relative rounded-xl border border-border bg-secondary/20 overflow-hidden hover:border-primary/50 transition-all duration-300 flex flex-col h-full shadow-[0_10px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_35px_rgba(201,169,107,0.08)] hover:shadow-[0_20px_50px_rgba(201,169,107,0.25)]">
       {/* Image container with gradient overlay */}
       <div className="relative aspect-4/3 overflow-hidden w-full">
         {event.cover_image_url ? (

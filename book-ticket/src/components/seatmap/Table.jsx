@@ -37,7 +37,7 @@ export const Table = memo(({ table, isSelected, onClick }) => {
   const handleAction = (e) => {
     if (isSold) return;
     e.preventDefault();
-    onClick(table);
+    onClick(table, e);
   };
 
   const handleKeyDown = (e) => {

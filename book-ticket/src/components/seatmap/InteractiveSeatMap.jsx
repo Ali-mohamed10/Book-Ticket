@@ -301,30 +301,40 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     isDragging.current = false;
   };
 
-  // Merge hover table with current select count
+  // Merge hover table or selected table with database status/count
   const hoveredTableMerged = useMemo(() => {
-    if (!hoveredTable) return null;
+    const activeTable = hoveredTable || (selectedTables.length > 0 ? selectedTables[0] : null);
+    if (!activeTable) return null;
+
+    const tableId = activeTable.table_code || activeTable.id;
+    const dbId = activeTable.db_id || activeTable.id;
+
+    const layoutTable = TABLE_LAYOUTS.find(
+      (t) => t.id.toUpperCase() === tableId.toUpperCase()
+    );
+    if (!layoutTable) return null;
+
     const selected = selectedTables.find(
-      (t) => (t.id === hoveredTable.db_id) || (t.table_code?.toUpperCase() === hoveredTable.id.toUpperCase())
+      (t) => (t.id === dbId) || (t.table_code?.toUpperCase() === tableId.toUpperCase())
     );
     const dbTables = seatMap?.tables || [];
     const dbTable = dbTables.find(
-      (t) => t.table_code.toUpperCase() === hoveredTable.id.toUpperCase()
+      (t) => t.table_code.toUpperCase() === tableId.toUpperCase()
     );
-    const cap = dbTable?.capacity || hoveredTable.capacity;
+    const cap = dbTable?.capacity || layoutTable.capacity;
     const booked = dbTable?.booked_seats || 0;
     const maxAvailable = cap - booked;
 
     return {
-      ...hoveredTable,
+      ...layoutTable,
       db_id: dbTable?.id,
-      table_code: hoveredTable.id,
+      table_code: layoutTable.id,
       selectedSeatsCount: selected ? (selected.selectedSeatsCount || 1) : 0,
       isSelected: !!selected,
       availableSeats: maxAvailable,
       bookedSeats: booked,
       capacity: cap,
-      price: dbTable?.price ? parseFloat(dbTable.price) : hoveredTable.price,
+      price: dbTable?.price ? parseFloat(dbTable.price) : layoutTable.price,
     };
   }, [hoveredTable, selectedTables, seatMap?.tables]);
 
@@ -366,7 +376,8 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
   }, []);
 
   // Selection callback to page
-  const handleTableClick = useCallback((table) => {
+  // Selection callback to page
+  const handleTableClick = useCallback((table, e) => {
     const finalTable = {
       id: table.db_id || table.id,
       table_code: table.table_code || table.id,
@@ -375,6 +386,17 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
       category: table.category,
       status: table.status,
     };
+
+    if (containerRef.current && e) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setTooltipPos({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+        containerWidth: rect.width,
+        containerHeight: rect.height,
+      });
+    }
+
     onTableSelect(finalTable);
   }, [onTableSelect]);
 
@@ -536,7 +558,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
                 <Table
                   table={table}
                   isSelected={isSelected}
-                  onClick={handleTableClick}
+                  onClick={(tbl, e) => handleTableClick(tbl, e)}
                 />
               </g>
             );
@@ -561,7 +583,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
         x={tooltipPos.x}
         y={tooltipPos.y}
         containerWidth={tooltipPos.containerWidth}
-        visible={!!hoveredTable}
+        visible={!!hoveredTableMerged}
         onSeatsCountChange={onSeatsCountChange}
         onTableSelect={handleTableClick}
         onMouseEnter={handleTooltipMouseEnter}

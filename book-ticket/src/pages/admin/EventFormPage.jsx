@@ -121,7 +121,7 @@ export const EventFormPage = () => {
       Object.keys(event).forEach(key => {
         if (key !== 'categories' && key !== 'seat_maps') {
           // Format dates for local datetime-local input
-          if (['start_date', 'end_date', 'sales_start', 'sales_end'].includes(key) && event[key]) {
+          if (['start_date', 'end_date'].includes(key) && event[key]) {
             const dateStr = new Date(event[key]).toISOString().slice(0, 16);
             setValue(key, dateStr);
           } else {
@@ -146,18 +146,13 @@ export const EventFormPage = () => {
     try {
       // Format dates back to ISO strings
       const formattedData = { ...data };
-      ['start_date', 'end_date', 'sales_start', 'sales_end'].forEach(key => {
+      ['start_date', 'end_date'].forEach(key => {
         if (formattedData[key]) {
           formattedData[key] = new Date(formattedData[key]).toISOString();
         } else {
           formattedData[key] = null;
         }
       });
-
-      // Handle empty max_capacity
-      if (formattedData.max_capacity === '') {
-        formattedData.max_capacity = null;
-      }
 
       if (isEditing) {
         await updateMutation.mutateAsync({ id, data: formattedData });
@@ -333,7 +328,7 @@ export const EventFormPage = () => {
               {t('admin.events.sectionSchedule', 'Schedule')}
             </h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInput
                 type="datetime-local"
                 label={t('admin.events.startDate', 'Start Date & Time') + ' *'}
@@ -345,27 +340,6 @@ export const EventFormPage = () => {
                 label={t('admin.events.endDate', 'End Date & Time') + ' *'}
                 {...register('end_date')}
                 error={errors.end_date?.message}
-              />
-              <FormInput
-                type="time"
-                label={t('admin.events.doorsOpen', 'Doors Open Time')}
-                {...register('doors_open_time')}
-                error={errors.doors_open_time?.message}
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-border/50">
-              <FormInput
-                type="datetime-local"
-                label={t('admin.events.salesStart', 'Ticket Sales Start')}
-                {...register('sales_start')}
-                error={errors.sales_start?.message}
-              />
-              <FormInput
-                type="datetime-local"
-                label={t('admin.events.salesEnd', 'Ticket Sales End')}
-                {...register('sales_end')}
-                error={errors.sales_end?.message}
               />
             </div>
           </section>
@@ -387,7 +361,7 @@ export const EventFormPage = () => {
               ))}
             </FormSelect>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInput
                 type="number"
                 min="0"
@@ -401,14 +375,6 @@ export const EventFormPage = () => {
                 {...register('currency')}
                 error={errors.currency?.message}
                 placeholder="CAD"
-              />
-              <FormInput
-                type="number"
-                min="1"
-                label={t('admin.events.maxCapacity', 'Max Capacity (Optional)')}
-                {...register('max_capacity')}
-                error={errors.max_capacity?.message}
-                placeholder="Leave empty for unlimited"
               />
             </div>
           </section>

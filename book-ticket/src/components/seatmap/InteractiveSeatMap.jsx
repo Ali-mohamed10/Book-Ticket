@@ -119,6 +119,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
   // Tooltip state
   const [hoveredTable, setHoveredTable] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  const [isTooltipDismissed, setIsTooltipDismissed] = useState(false);
 
   // Zoom Scroll Overlay prompt state
   const [showScrollOverlay, setShowScrollOverlay] = useState(false);
@@ -303,7 +304,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
 
   // Merge hover table or selected table with database status/count
   const hoveredTableMerged = useMemo(() => {
-    const activeTable = hoveredTable || (selectedTables.length > 0 ? selectedTables[0] : null);
+    const activeTable = hoveredTable || (!isTooltipDismissed && selectedTables.length > 0 ? selectedTables[0] : null);
     if (!activeTable) return null;
 
     const tableId = activeTable.table_code || activeTable.id;
@@ -355,6 +356,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
       containerHeight: rect.height,
     });
     
+    setIsTooltipDismissed(false);
     setHoveredTable(table);
   }, []);
 
@@ -398,6 +400,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
       });
     }
 
+    setIsTooltipDismissed(false);
     onTableSelect(finalTable);
   }, [onTableSelect]);
 
@@ -589,6 +592,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
         onTableSelect={handleTableClick}
         onMouseEnter={handleTooltipMouseEnter}
         onMouseLeave={handleTooltipMouseLeave}
+        onClose={() => setIsTooltipDismissed(true)}
       />
     </div>
   );

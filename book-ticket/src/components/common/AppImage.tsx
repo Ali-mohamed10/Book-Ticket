@@ -66,8 +66,7 @@ export const AppImage = memo(({
           alt={alt}
           loading={loadingMode}
           decoding="async"
-          // @ts-ignore - fetchpriority is a modern HTML attribute supported in browsers
-          fetchpriority={fetchPriority}
+          fetchPriority={fetchPriority}
           onLoad={handleLoad}
           onError={handleError}
           className={`transition-opacity duration-300 ${

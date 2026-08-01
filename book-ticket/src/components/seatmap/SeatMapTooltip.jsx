@@ -44,13 +44,15 @@ export const SeatMapTooltip = ({
   const isSelected = table.isSelected;
   const isSold = table.status === 'sold';
 
+  const isNearTop = y < 220;
+
   return (
     <div 
-      className="absolute z-50 pointer-events-auto bg-[#1A1610]/95 backdrop-blur-md text-[#F7F1E8] border border-primary/20 shadow-xl rounded-lg p-3 min-w-48 transition-opacity duration-200"
+      className="absolute z-50 pointer-events-auto bg-[#1A1610]/95 backdrop-blur-md text-[#F7F1E8] border border-primary/20 shadow-xl rounded-lg p-3 min-w-48 transition-all duration-200"
       style={{
         left: `${x}px`,
         top: `${y}px`,
-        transform: 'translate(-50%, -105%)', // slightly adjusted so there's less gap
+        transform: `translate(-50%, ${isNearTop ? '15px' : '-105%'})`,
         opacity: visible ? 1 : 0
       }}
       onMouseEnter={onMouseEnter}

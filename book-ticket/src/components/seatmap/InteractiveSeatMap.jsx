@@ -120,6 +120,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
   const [hoveredTable, setHoveredTable] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const [isTooltipDismissed, setIsTooltipDismissed] = useState(false);
+  const [dismissedTableId, setDismissedTableId] = useState(null);
 
   // Zoom Scroll Overlay prompt state
   const [showScrollOverlay, setShowScrollOverlay] = useState(false);
@@ -308,6 +309,9 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     if (!activeTable) return null;
 
     const tableId = activeTable.table_code || activeTable.id;
+    if (dismissedTableId && tableId.toUpperCase() === dismissedTableId.toUpperCase()) {
+      return null;
+    }
     const dbId = activeTable.db_id || activeTable.id;
 
     const layoutTable = TABLE_LAYOUTS.find(
@@ -345,6 +349,10 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     if (tooltipTimeoutRef.current) {
       clearTimeout(tooltipTimeoutRef.current);
     }
+    const tId = table.table_code || table.id;
+    if (dismissedTableId && tId.toUpperCase() === dismissedTableId.toUpperCase()) {
+      return;
+    }
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     
@@ -358,9 +366,10 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
     
     setIsTooltipDismissed(false);
     setHoveredTable(table);
-  }, []);
+  }, [dismissedTableId]);
 
   const handleTableMouseLeave = useCallback(() => {
+    setDismissedTableId(null);
     tooltipTimeoutRef.current = setTimeout(() => {
       setHoveredTable(null);
     }, 250);
@@ -400,6 +409,7 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
       });
     }
 
+    setDismissedTableId(null);
     setIsTooltipDismissed(false);
     onTableSelect(finalTable);
   }, [onTableSelect]);
@@ -593,6 +603,9 @@ export const InteractiveSeatMap = ({ seatMap, onTableSelect, selectedTables = []
         onMouseEnter={handleTooltipMouseEnter}
         onMouseLeave={handleTooltipMouseLeave}
         onClose={() => {
+          if (hoveredTableMerged) {
+            setDismissedTableId(hoveredTableMerged.table_code || hoveredTableMerged.id);
+          }
           setHoveredTable(null);
           setIsTooltipDismissed(true);
         }}

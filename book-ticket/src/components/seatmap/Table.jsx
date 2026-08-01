@@ -53,11 +53,11 @@ export const Table = memo(({ table, isSelected, onClick }) => {
    */
   const getTableClasses = () => {
     // Base: always the category color
-    const base = `fill-${colorClass}/25 stroke-${colorClass}`;
+    const base = `fill-${colorClass} fill-opacity-25 stroke-${colorClass}`;
 
     if (isSelected) {
       // Selected: gold outline + scale + glow, but keep category fill
-      return `fill-${colorClass}/40 stroke-seat-selected stroke-[2.5]`;
+      return `fill-${colorClass} fill-opacity-40 stroke-seat-selected stroke-[2.5]`;
     }
     if (isSold) {
       // Sold: keep category color but desaturate + reduce opacity
@@ -68,16 +68,18 @@ export const Table = memo(({ table, isSelected, onClick }) => {
       return `${base} stroke-seat-reserved-border stroke-2`;
     }
     // Available: normal with hover effects
-    return `${base} hover:fill-${colorClass}/40 hover:scale-105`;
+    return `${base} hover:fill-opacity-40 hover:scale-105`;
   };
 
   /**
    * Chair colors always match the category, never the status.
+   * We make them solid and bright so they are clearly visible against the dark background.
    */
   const getChairClasses = () => {
-    if (isSelected) return `fill-${colorClass}/70 stroke-seat-selected/50`;
-    if (isSold) return `fill-${colorClass}/15 stroke-${colorClass}/10`;
-    return `fill-${colorClass}/60 stroke-${colorClass}/30`;
+    if (isSelected) return 'fill-seat-selected stroke-seat-selected';
+    if (isSold) return `fill-${colorClass} fill-opacity-15 stroke-${colorClass} stroke-opacity-10`;
+    if (isReserved) return `fill-${colorClass} fill-opacity-80 stroke-${colorClass}`;
+    return `fill-${colorClass} stroke-${colorClass}`;
   };
 
   // Render chairs based on table capacity and shape layout

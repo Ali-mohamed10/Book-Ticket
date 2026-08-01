@@ -10,17 +10,25 @@
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { CreditCard, Lock, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import { isValidPhoneNumber } from 'libphonenumber-js';
+import PhoneInput from '../common/PhoneInput';
 
 // Checkout form validation schema
 const checkoutSchema = z.object({
   fullName: z.string().min(2, 'Full name is required'),
   email: z.string().email('Invalid email address'),
-  phone: z.string().min(10, 'Phone number is required'),
+  phone: z.string().refine((val) => {
+    try {
+      return isValidPhoneNumber(val);
+    } catch {
+      return false;
+    }
+  }, 'Invalid phone number'),
 });
 
 const CheckoutCard = memo(({ grandTotal = 0, currency = 'CAD', disabled = false }) => {
@@ -32,6 +40,7 @@ const CheckoutCard = memo(({ grandTotal = 0, currency = 'CAD', disabled = false 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(checkoutSchema),
@@ -97,20 +106,24 @@ const CheckoutCard = memo(({ grandTotal = 0, currency = 'CAD', disabled = false 
         </div>
 
         {/* Phone */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            {t('checkout.phoneNumber', 'Phone Number')}
-          </label>
-          <input
-            type="tel"
-            {...register('phone')}
-            placeholder={t('checkout.phonePlaceholder', '(647) 123-4567')}
-            className="w-full bg-background border border-input rounded-md px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-primary transition-colors"
-          />
-          {errors.phone && (
-            <span className="text-xs text-destructive">{errors.phone.message}</span>
+        <Controller
+          name="phone"
+          control={control}
+          render={({ field }) => (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                {t('checkout.phoneNumber', 'Phone Number')}
+              </label>
+              <PhoneInput
+                value={field.value}
+                onChange={field.onChange}
+                placeholder={t('checkout.phonePlaceholder', '+1 234 567 8900')}
+                error={errors.phone?.message}
+                disabled={disabled}
+              />
+            </div>
           )}
-        </div>
+        />
 
         {/* Payment method (visual only) */}
         <div className="flex flex-col gap-1.5">

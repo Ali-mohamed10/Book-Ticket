@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import { Mail, Lock, User, Phone } from 'lucide-react';
@@ -8,6 +8,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { registerSchema } from '../../lib/validations/authSchemas';
 import { FormInput } from '../../components/ui/FormInput';
 import { FormButton } from '../../components/ui/FormButton';
+import PhoneInput from '../../components/common/PhoneInput';
 
 export const RegisterPage = () => {
   const { t } = useTranslation();
@@ -18,6 +19,7 @@ export const RegisterPage = () => {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(registerSchema),
@@ -67,13 +69,23 @@ export const RegisterPage = () => {
           {...register('fullName')}
         />
 
-        <FormInput
-          label={t('auth.phone', 'Phone Number')}
-          type="tel"
-          placeholder={t('auth.phonePlaceholder', '+1234567890')}
-          icon={Phone}
-          error={errors.phone?.message ? t(errors.phone.message) : ''}
-          {...register('phone')}
+        <Controller
+          name="phone"
+          control={control}
+          render={({ field }) => (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-foreground">
+                {t('auth.phone', 'Phone Number')}
+              </label>
+              <PhoneInput
+                value={field.value}
+                onChange={field.onChange}
+                placeholder={t('auth.phonePlaceholder', '+1 234 567 8900')}
+                error={errors.phone?.message ? t(errors.phone.message) : ''}
+                disabled={isSubmitting}
+              />
+            </div>
+          )}
         />
 
         <FormInput

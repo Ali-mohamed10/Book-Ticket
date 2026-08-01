@@ -6,7 +6,8 @@
  *
  * Dependencies: zod
  */
-import { z } from 'zod/v4';
+import { z } from 'zod';
+import { isValidPhoneNumber } from 'libphonenumber-js';
 
 export const loginSchema = z.object({
   email: z
@@ -25,9 +26,13 @@ export const registerSchema = z
       .min(2, 'validation.fullNameMin'),
     phone: z
       .string()
-      .min(10, 'validation.phoneMin')
-      .max(15, 'validation.phoneMax')
-      .regex(/^\+?[0-9]+$/, 'validation.phoneInvalid'),
+      .refine((val) => {
+        try {
+          return isValidPhoneNumber(val);
+        } catch {
+          return false;
+        }
+      }, 'validation.phoneInvalid'),
     email: z
       .string()
       .min(1, 'validation.emailRequired')

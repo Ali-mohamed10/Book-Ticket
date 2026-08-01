@@ -1,4 +1,5 @@
 import { Calendar, MapPin, Clock } from 'lucide-react';
+import AppImage from '../common/AppImage';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -40,11 +41,11 @@ export const EventCard = ({ event }) => {
         {/* Image container with gradient overlay */}
         <div className="relative aspect-4/3 overflow-hidden w-full">
           {event.cover_image_url ? (
-            <img
+            <AppImage
               src={event.cover_image_url}
               alt={title}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              loading="lazy"
+              containerClassName="w-full h-full"
             />
           ) : (
             <div className="w-full h-full bg-secondary/50 flex items-center justify-center">

@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabaseClient';
+import { uploadSeatMap } from './imageUpload';
 
 const BUCKET_NAME = 'seat-maps';
 
@@ -75,21 +76,8 @@ export const seatMapService = {
   },
 
   // Upload file to Supabase Storage
-  async uploadFile(file, path) {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-    const filePath = `${path}/${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from(BUCKET_NAME)
-      .upload(filePath, file);
-
-    if (uploadError) throw uploadError;
-
-    const { data } = supabase.storage
-      .from(BUCKET_NAME)
-      .getPublicUrl(filePath);
-
-    return data.publicUrl;
+  async uploadFile(file, path, onProgress) {
+    const result = await uploadSeatMap(file, path, onProgress);
+    return result.publicUrl;
   }
 };

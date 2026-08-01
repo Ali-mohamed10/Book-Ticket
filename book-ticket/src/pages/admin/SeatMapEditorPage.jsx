@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ArrowLeft, Save, Plus, Trash2, MapPin, Grid, Layers, ZoomIn, ZoomOut, RefreshCw } from 'lucide-react';
+import AppImage from '../../components/common/AppImage';
 import { 
   useSeatMap, 
   useUpdateSeatMap, 
@@ -233,7 +235,7 @@ export const SeatMapEditorPage = () => {
               />
               {seatMap.preview_image_url && (
                 <div className="mt-2 w-32 h-20 rounded overflow-hidden border border-border">
-                  <img src={seatMap.preview_image_url} alt="Preview" className="w-full h-full object-cover" />
+                  <AppImage src={seatMap.preview_image_url} alt="Preview" className="w-full h-full object-cover" containerClassName="w-full h-full" />
                 </div>
               )}
             </div>

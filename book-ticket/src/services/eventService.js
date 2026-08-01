@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabaseClient';
+import { uploadEventCover } from './imageUpload';
 
 const BUCKET_NAME = 'event-images';
 
@@ -108,21 +109,8 @@ export const eventService = {
   },
 
   // Upload cover image
-  async uploadCoverImage(file) {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-    const filePath = `covers/${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from(BUCKET_NAME)
-      .upload(filePath, file);
-
-    if (uploadError) throw uploadError;
-
-    const { data } = supabase.storage
-      .from(BUCKET_NAME)
-      .getPublicUrl(filePath);
-
-    return data.publicUrl;
+  async uploadCoverImage(file, eventId, onProgress) {
+    const result = await uploadEventCover(file, eventId, onProgress);
+    return result.publicUrl;
   }
 };

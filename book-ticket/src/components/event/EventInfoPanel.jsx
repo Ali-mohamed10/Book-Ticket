@@ -10,6 +10,7 @@ import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Calendar, Clock, MapPin } from 'lucide-react';
+import AppImage from '../common/AppImage';
 
 const EventInfoPanel = memo(({ event }) => {
   const { t, i18n } = useTranslation();
@@ -59,11 +60,12 @@ const EventInfoPanel = memo(({ event }) => {
       {/* Cover image */}
       {event.cover_image_url && (
         <div className="rounded-lg overflow-hidden border border-border aspect-video">
-          <img
+          <AppImage
             src={event.cover_image_url}
             alt={title}
+            priority={true}
             className="w-full h-full object-cover"
-            loading="lazy"
+            containerClassName="w-full h-full"
           />
         </div>
       )}

@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import logoImage from '../../assets/Logo.webp';
+import AppImage from '../common/AppImage';
 
 export const Logo = ({ onClick }) => {
   return (
@@ -8,7 +9,7 @@ export const Logo = ({ onClick }) => {
       onClick={onClick}
       className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-ring rounded-md p-1"
     >
-      <img src={logoImage} alt="Khaleeji Tour" className="h-10 w-auto object-contain" />
+      <AppImage src={logoImage} alt="Khaleeji Tour" priority={true} className="h-10 w-auto object-contain" />
     </NavLink>
   );
 };

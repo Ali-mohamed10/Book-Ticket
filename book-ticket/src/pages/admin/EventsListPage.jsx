@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useEvents, useDeleteEvent, useDuplicateEvent, useUpdateEvent } from '../../hooks/useEvents';
 import { StatusBadge } from '../../components/ui/StatusBadge';
+import AppImage from '../../components/common/AppImage';
 
 export const EventsListPage = () => {
   const { t, i18n } = useTranslation();
@@ -174,14 +175,15 @@ export const EventsListPage = () => {
             return (
               <div 
                 key={event.id}
-                className={`bg-secondary/5 border border-border rounded-lg overflow-hidden transition-all hover:border-primary/30 flex flex-col ${isDeleting ? 'opacity-50 pointer-events-none' : ''}`}
+                className={`bg-secondary/5 border border-primary/50 rounded-lg overflow-hidden transition-all hover:border-primary/30 flex flex-col ${isDeleting ? 'opacity-50 pointer-events-none' : ''}`}
               >
                 <div className="relative aspect-video bg-muted border-b border-border">
                   {event.cover_image_url ? (
-                    <img 
+                    <AppImage 
                       src={event.cover_image_url} 
                       alt={title}
                       className="w-full h-full object-cover"
+                      containerClassName="w-full h-full"
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground/50">

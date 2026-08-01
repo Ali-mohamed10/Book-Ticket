@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useSeatMaps, useCreateSeatMap, useDeleteSeatMap } from '../../hooks/useSeatMaps';
+import AppImage from '../../components/common/AppImage';
 
 export const SeatMapsListPage = () => {
   const { t } = useTranslation();
@@ -18,10 +19,13 @@ export const SeatMapsListPage = () => {
     if (!newMapName.trim()) return;
 
     try {
-      const slug = newMapName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const slug = newMapName
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-');
       const newMap = await createMutation.mutateAsync({
         name: newMapName.trim(),
-        slug: `${slug}-${Date.now()}` // Ensure unique slug
+        slug: `${slug}-${Date.now()}`, // Ensure unique slug
       });
       setIsCreating(false);
       setNewMapName('');
@@ -32,7 +36,14 @@ export const SeatMapsListPage = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm(t('admin.seatMaps.confirmDelete', 'Are you sure you want to delete this seat map? All associated tables will be deleted.'))) {
+    if (
+      window.confirm(
+        t(
+          'admin.seatMaps.confirmDelete',
+          'Are you sure you want to delete this seat map? All associated tables will be deleted.'
+        )
+      )
+    ) {
       try {
         await deleteMutation.mutateAsync(id);
       } catch (error) {
@@ -66,7 +77,10 @@ export const SeatMapsListPage = () => {
       </div>
 
       {isCreating && (
-        <form onSubmit={handleCreate} className="p-4 bg-secondary/10 border border-border rounded-lg flex gap-4 items-end">
+        <form
+          onSubmit={handleCreate}
+          className="p-4 bg-secondary/10 border rounded-lg flex gap-4 items-end"
+        >
           <div className="flex-1">
             <label className="block text-sm font-medium mb-1">
               {t('admin.seatMaps.name', 'Name')}
@@ -108,16 +122,20 @@ export const SeatMapsListPage = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {seatMaps?.map((map) => (
-            <div key={map.id} className="bg-card border border-border rounded-lg overflow-hidden flex flex-col shadow-sm">
-              <div 
+            <div
+              key={map.id}
+              className="bg-card border border-primary/50 rounded-lg overflow-hidden flex flex-col"
+            >
+              <div
                 className="h-48 bg-secondary/20 relative cursor-pointer"
                 onClick={() => navigate(`/admin/seat-maps/${map.id}`)}
               >
                 {map.preview_image_url ? (
-                  <img 
-                    src={map.preview_image_url} 
+                  <AppImage
+                    src={map.preview_image_url}
                     alt={map.name}
                     className="w-full h-full object-cover"
+                    containerClassName="w-full h-full"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
@@ -132,7 +150,7 @@ export const SeatMapsListPage = () => {
               </div>
               <div className="p-4 flex flex-col flex-1">
                 <h3 className="text-lg font-bold text-foreground mb-4">{map.name}</h3>
-                
+
                 <div className="flex items-center justify-between mt-auto">
                   <button
                     onClick={() => navigate(`/admin/seat-maps/${map.id}`)}
@@ -140,7 +158,7 @@ export const SeatMapsListPage = () => {
                   >
                     {t('admin.seatMaps.editTitle', 'Edit Seat Map')}
                   </button>
-                  
+
                   <button
                     onClick={() => handleDelete(map.id)}
                     className="text-sm font-medium text-destructive hover:underline"

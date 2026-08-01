@@ -1,4 +1,4 @@
-import { Calendar, MapPin } from 'lucide-react';
+import { Calendar, MapPin, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -21,8 +21,21 @@ export const EventCard = ({ event }) => {
       .toUpperCase();
   };
 
+  const formatTimeRange = (startStr, endStr) => {
+    if (!startStr) return '';
+    const startDate = new Date(startStr);
+    const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+    const startTime = startDate.toLocaleTimeString(isArabic ? 'ar-EG' : 'en-US', options);
+    
+    if (!endStr) return startTime;
+    const endDate = new Date(endStr);
+    const endTime = endDate.toLocaleTimeString(isArabic ? 'ar-EG' : 'en-US', options);
+    
+    return `${startTime} - ${endTime}`;
+  };
+
   return (
-    <div className="group relative rounded-xl border border-border bg-secondary/20 overflow-hidden hover:border-primary/50 transition-all duration-300 flex flex-col h-full shadow-premium hover:shadow-[0_0_20px_rgba(201,169,107,0.2)]">
+    <div className="group relative rounded-2xl border border-primary/50 bg-secondary/20 overflow-hidden hover:border-primary/50 transition-all duration-300 flex flex-col h-full shadow-premium hover:shadow-[0_0_20px_rgba(201,169,107,0.2)]">
       {/* Image container with gradient overlay */}
       <div className="relative aspect-4/3 overflow-hidden w-full">
         {event.cover_image_url ? (
@@ -39,21 +52,22 @@ export const EventCard = ({ event }) => {
         )}
         {/* Gradient overlay similar to design */}
         <div className="absolute inset-0 bg-linear-to-t from-[#12100B] via-[#12100B]/50 to-transparent opacity-90" />
-
-        {/* Title placed at the bottom of the image area */}
-        <div className="absolute bottom-0 left-0 right-0 p-5 pb-3">
-          <h3 className="text-xl md:text-2xl font-serif text-primary mb-1 uppercase tracking-wider font-bold drop-shadow-md">
-            {title}
-          </h3>
-        </div>
       </div>
 
       {/* Content */}
       <div className="flex flex-col grow p-5 pt-3">
         <div className="space-y-3 mb-6">
+          <h3 className="text-xl md:text-2xl font-serif text-primary mb-4 uppercase tracking-wider font-bold drop-shadow-md">
+            {title}
+          </h3>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Calendar className="w-4 h-4 text-primary/70 shrink-0" />
             <span>{formatDate(event.start_date)}</span>
+          </div>
+
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Clock className="w-4 h-4 text-primary/70 shrink-0" />
+            <span>{formatTimeRange(event.start_date, event.end_date)}</span>
           </div>
 
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -75,7 +89,7 @@ export const EventCard = ({ event }) => {
 
           <Link
             to={`/events/${event.slug}`}
-            className="bg-[#D4AF37] hover:bg-[#B8860B] text-black font-medium py-2 px-6 rounded-sm text-sm uppercase tracking-wider transition-colors duration-300"
+            className="bg-[#D4AF37] hover:bg-[#B8860B] text-black font-medium py-2 px-6 rounded-xl text-sm uppercase tracking-wider transition-colors duration-300"
           >
             {t('events.bookNow', 'BOOK NOW')}
           </Link>

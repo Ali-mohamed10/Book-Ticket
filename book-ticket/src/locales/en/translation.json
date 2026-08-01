@@ -1,5 +1,12 @@
 {
   "welcome": "Welcome to Khaleeji Tour",
+  "home": {
+    "title": "Exclusive Ticketing, Redefined",
+    "subtitle": "Discover premium shows, grand concerts, and elite corporate experiences with the ultimate seat selection experience.",
+    "featuredEvents": "Featured Events",
+    "noEvents": "No events found",
+    "tryLater": "Check back later for upcoming premium events."
+  },
   "nav": {
     "events": "Events",
     "howItWorks": "How it works",

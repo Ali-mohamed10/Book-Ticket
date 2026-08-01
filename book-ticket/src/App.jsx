@@ -28,6 +28,7 @@ const EventFormPage = lazy(() => import('./pages/admin/EventFormPage'));
 
 // Lazy load public pages
 const EventDetailsPage = lazy(() => import('./pages/events/EventDetailsPage'));
+const HomePage = lazy(() => import('./pages/HomePage'));
 
 // Lazy load error pages
 const UnauthorizedPage = lazy(() => import('./pages/errors/UnauthorizedPage'));
@@ -49,7 +50,7 @@ const App = () => {
             <Routes>
               {/* Public & Protected Routes inside Main Layout */}
               <Route path="/" element={<MainLayout />}>
-                <Route index element={<div className="text-center py-20 text-2xl font-bold font-sans">Welcome to Khaleeji Tour</div>} />
+                <Route index element={<HomePage />} />
                 <Route path="events/:slug" element={<EventDetailsPage />} />
                 
                 {/* Admin Routes */}

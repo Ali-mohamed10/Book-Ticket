@@ -1,18 +1,23 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { 
-  Plus, 
-  Search, 
-  Edit, 
-  Copy, 
-  Trash2, 
+import {
+  Plus,
+  Search,
+  Edit,
+  Copy,
+  Trash2,
   Calendar,
   MapPin,
   MoreVertical,
-  Globe
+  Globe,
 } from 'lucide-react';
-import { useEvents, useDeleteEvent, useDuplicateEvent, useUpdateEvent } from '../../hooks/useEvents';
+import {
+  useEvents,
+  useDeleteEvent,
+  useDuplicateEvent,
+  useUpdateEvent,
+} from '../../hooks/useEvents';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import AppImage from '../../components/common/AppImage';
 
@@ -20,7 +25,7 @@ export const EventsListPage = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const isArabic = i18n.language === 'ar';
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [deletingId, setDeletingId] = useState(null);
@@ -30,15 +35,17 @@ export const EventsListPage = () => {
   const duplicateMutation = useDuplicateEvent();
   const updateMutation = useUpdateEvent();
 
-  const filteredEvents = events?.filter(event => {
-    const title = isArabic ? (event.title_ar || event.title_en) : (event.title_en || event.title_ar);
+  const filteredEvents = events?.filter((event) => {
+    const title = isArabic ? event.title_ar || event.title_en : event.title_en || event.title_ar;
     const matchesSearch = title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || event.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   const handleDelete = async (id) => {
-    if (window.confirm(t('admin.events.confirmDelete', 'Are you sure you want to delete this event?'))) {
+    if (
+      window.confirm(t('admin.events.confirmDelete', 'Are you sure you want to delete this event?'))
+    ) {
       try {
         setDeletingId(id);
         await deleteMutation.mutateAsync(id);
@@ -65,7 +72,7 @@ export const EventsListPage = () => {
     try {
       await updateMutation.mutateAsync({
         id: event.id,
-        data: { status: newStatus }
+        data: { status: newStatus },
       });
     } catch (err) {
       console.error('Failed to update status:', err);
@@ -121,7 +128,9 @@ export const EventsListPage = () => {
       {/* Filters section */}
       <div className="flex flex-col sm:flex-row gap-4 bg-secondary/10 p-4 rounded-lg border border-border">
         <div className="relative grow">
-          <Search className={`absolute ${isArabic ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`} />
+          <Search
+            className={`absolute ${isArabic ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground`}
+          />
           <input
             type="text"
             placeholder={t('admin.events.search', 'Search events...')}
@@ -151,11 +160,11 @@ export const EventsListPage = () => {
             {t('admin.events.noEvents', 'No events found')}
           </h3>
           <p className="text-sm text-muted-foreground mb-4">
-            {searchTerm || statusFilter !== 'all' 
+            {searchTerm || statusFilter !== 'all'
               ? t('admin.events.adjustFilters', 'Try adjusting your filters')
               : t('admin.events.createFirst', 'Get started by creating your first event')}
           </p>
-          {(!searchTerm && statusFilter === 'all') && (
+          {!searchTerm && statusFilter === 'all' && (
             <Link
               to="/admin/events/create"
               className="flex items-center gap-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 px-4 py-2 rounded-md text-sm font-medium transition-colors"
@@ -167,22 +176,27 @@ export const EventsListPage = () => {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {filteredEvents?.map(event => {
-            const title = isArabic ? (event.title_ar || event.title_en) : (event.title_en || event.title_ar);
-            const venueName = isArabic ? (event.venue_ar || event.venue_en) : (event.venue_en || event.venue_ar);
+          {filteredEvents?.map((event) => {
+            const title = isArabic
+              ? event.title_ar || event.title_en
+              : event.title_en || event.title_ar;
+            const venueName = isArabic
+              ? event.venue_ar || event.venue_en
+              : event.venue_en || event.venue_ar;
             const isDeleting = deletingId === event.id;
-            
+
             return (
-              <div 
+              <div
                 key={event.id}
-                className={`bg-secondary/5 border border-primary/50 rounded-lg overflow-hidden transition-all hover:border-primary/30 flex flex-col ${isDeleting ? 'opacity-50 pointer-events-none' : ''}`}
+                onClick={() => navigate(`/admin/events/${event.id}/edit`)}
+                className={`bg-secondary/5 border border-primary/50 rounded-lg overflow-hidden transition-all hover:border-primary/30 flex flex-col cursor-pointer group ${isDeleting ? 'opacity-50 pointer-events-none' : ''}`}
               >
                 <div className="relative aspect-video bg-muted border-b border-border">
                   {event.cover_image_url ? (
-                    <AppImage 
-                      src={event.cover_image_url} 
+                    <AppImage
+                      src={event.cover_image_url}
                       alt={title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       containerClassName="w-full h-full"
                     />
                   ) : (
@@ -195,59 +209,75 @@ export const EventsListPage = () => {
                     <StatusBadge status={event.status} />
                   </div>
                 </div>
-                
+
                 <div className="p-4 grow flex flex-col">
-                  <h3 className="font-bold text-foreground mb-2 line-clamp-1" title={title}>
+                  <h3 className="font-bold text-foreground mb-2 line-clamp-1 group-hover:text-primary transition-colors" title={title}>
                     {title}
                   </h3>
-                  
+
                   <div className="space-y-2 mt-auto mb-4">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Calendar className="w-4 h-4 shrink-0 text-primary/70" />
-                      <span className="line-clamp-1">{formatDate(event.start_date)} - {formatDate(event.end_date)}</span>
+                      <span className="line-clamp-1">
+                        {formatDate(event.start_date)} - {formatDate(event.end_date)}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <MapPin className="w-4 h-4 shrink-0 text-primary/70" />
-                      <span className="line-clamp-1">{venueName || t('admin.events.noVenue', 'No Venue')}</span>
+                      <span className="line-clamp-1">
+                        {venueName || t('admin.events.noVenue', 'No Venue')}
+                      </span>
                     </div>
                   </div>
-                  
+
                   <div className="pt-3 border-t border-border flex items-center justify-between gap-2">
                     <button
-                      onClick={() => toggleStatus(event)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleStatus(event);
+                      }}
                       className={`text-xs px-2 py-1.5 rounded flex items-center gap-1.5 transition-colors ${
-                        event.status === 'published' 
-                          ? 'bg-amber-500/10 text-amber-600 hover:bg-amber-500/20' 
+                        event.status === 'published'
+                          ? 'bg-amber-500/10 text-amber-600 hover:bg-amber-500/20'
                           : 'bg-green-500/10 text-green-600 hover:bg-green-500/20'
                       }`}
                       disabled={updateMutation.isPending}
                     >
                       <Globe className="w-3.5 h-3.5" />
-                      {event.status === 'published' 
-                        ? t('admin.events.actionUnpublish', 'Unpublish') 
+                      {event.status === 'published'
+                        ? t('admin.events.actionUnpublish', 'Unpublish')
                         : t('admin.events.actionPublish', 'Publish')}
                     </button>
-                    
-                    <div className="flex items-center gap-1">
+
+                    <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                       <button
-                        onClick={() => handleDuplicate(event.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDuplicate(event.id);
+                        }}
                         className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded transition-colors"
                         title={t('admin.events.duplicate', 'Duplicate')}
                         disabled={duplicateMutation.isPending}
                       >
                         <Copy className="w-4 h-4" />
                       </button>
-                      
-                      <Link
-                        to={`/admin/events/${event.id}/edit`}
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(event.id);
+                        }}
                         className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded transition-colors"
                         title={t('admin.events.edit', 'Edit')}
                       >
                         <Edit className="w-4 h-4" />
-                      </Link>
-                      
+                      </button>
+
                       <button
-                        onClick={() => handleDelete(event.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(event.id);
+                        }}
                         className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors"
                         title={t('admin.events.delete', 'Delete')}
                         disabled={isDeleting}

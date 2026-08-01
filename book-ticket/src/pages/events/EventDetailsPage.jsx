@@ -168,15 +168,8 @@ export const EventDetailsPage = () => {
       {/* Mobile sticky checkout bar */}
       {selectedTables.length > 0 && !isCheckingOut && (
         <div className="fixed bottom-0 inset-x-0 md:hidden bg-card border-t border-border p-4 shadow-premium-top z-40">
-          <div className="flex items-center justify-between container mx-auto">
-            <div className="shrink-0 mr-4">
-              <span className="text-xs text-muted-foreground block">
-                {t('seatMap.total', 'Total')}
-              </span>
-              <span className="text-xl font-bold font-serif text-primary">
-                ${grandTotal.toFixed(2)} {event.currency || 'CAD'}
-              </span>
-            </div>
+          <div className="flex items-center flex-wrap justify-center container mx-auto">
+            
             <button 
               onClick={() => setIsCheckingOut(true)}
               className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity shrink-0"

@@ -2,10 +2,12 @@ import { z } from 'zod';
 
 export const eventSchema = z.object({
   title_en: z.string().min(3, { message: 'Title (EN) must be at least 3 characters' }),
+  title_ar: z.string().optional(),
   slug: z.string()
     .min(3, { message: 'Slug must be at least 3 characters' })
     .regex(/^[a-z0-9-]+$/, { message: 'Slug can only contain lowercase letters, numbers, and hyphens' }),
   description_en: z.string().optional(),
+  description_ar: z.string().optional(),
   
   country_en: z.string().min(1, { message: 'Country (EN) is required' }),
   country_ar: z.string().optional(),

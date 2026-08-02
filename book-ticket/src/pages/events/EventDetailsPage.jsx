@@ -157,6 +157,8 @@ export const EventDetailsPage = () => {
                 </button>
               )}
               <CheckoutCard
+                eventId={event.id}
+                selectedTables={selectedTables}
                 grandTotal={grandTotal}
                 currency={event.currency || 'CAD'}
                 disabled={selectedTables.length === 0}

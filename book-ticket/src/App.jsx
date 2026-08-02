@@ -29,6 +29,8 @@ const EventFormPage = lazy(() => import('./pages/admin/EventFormPage'));
 // Lazy load public pages
 const EventDetailsPage = lazy(() => import('./pages/events/EventDetailsPage'));
 const HomePage = lazy(() => import('./pages/HomePage'));
+const BookingSuccessPage = lazy(() => import('./pages/booking/BookingSuccessPage'));
+const BookingCancelPage = lazy(() => import('./pages/booking/BookingCancelPage'));
 
 // Lazy load error pages
 const UnauthorizedPage = lazy(() => import('./pages/errors/UnauthorizedPage'));
@@ -74,6 +76,8 @@ const App = () => {
               <Route path="/" element={<MainLayout />}>
                 <Route index element={<HomePage />} />
                 <Route path="events/:slug" element={<EventDetailsPage />} />
+                <Route path="booking/success" element={<BookingSuccessPage />} />
+                <Route path="booking/cancel" element={<BookingCancelPage />} />
                 
                 {/* Admin Routes */}
                 <Route path="admin" element={

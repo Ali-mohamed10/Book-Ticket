@@ -1,8 +1,11 @@
 import axios from 'axios';
 import { CheckoutParams, CheckoutResponse, Booking } from '../types/booking';
 
-// Use environment variable or fallback to local backend server
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:3001';
+// Use VITE_API_BASE_URL if explicitly defined, otherwise fallback to local 3001 in dev or relative URL on Vercel
+const envApiUrl = (import.meta as any).env?.VITE_API_BASE_URL;
+const API_BASE_URL = envApiUrl !== undefined && envApiUrl !== '' 
+  ? envApiUrl 
+  : ((import.meta as any).env?.DEV ? 'http://localhost:3001' : '');
 
 export const bookingService = {
   /**

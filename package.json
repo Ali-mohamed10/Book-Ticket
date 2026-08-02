@@ -1,0 +1,16 @@
+{
+  "name": "book-ticket-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd book-ticket && npm install && npm run build",
+    "start": "cd back-end && npm start",
+    "dev": "cd book-ticket && npm run dev"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.110.8",
+    "dotenv": "^17.4.2",
+    "qrcode": "^1.5.4",
+    "stripe": "^22.3.2"
+  }
+}

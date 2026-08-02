@@ -1,14 +1,16 @@
 /**
- * Supabase Admin Client (Service Role)
+ * Supabase Admin Client
  *
- * Used exclusively by serverless backend / API endpoints to execute privileged database actions
- * (such as confirming payments, generating tickets, and managing row locks).
+ * Used by serverless backend / API endpoints to execute database actions.
  */
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const supabaseServiceKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.SUPABASE_ANON_KEY ||
+  process.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl) {
   console.warn('Backend warning: SUPABASE_URL environment variable missing.');

@@ -16,6 +16,10 @@
     {
       "path": "/api/cron/expire-reservations",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/health",
+      "schedule": "0 */6 * * *"
     }
   ]
 }
